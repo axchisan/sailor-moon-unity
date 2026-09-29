@@ -35,7 +35,7 @@ orientativas: el Nivel 1 de Godot, con todo, fueron unas 17.
 | Fase | Qué | Sesiones | Estado |
 |---|---|---|---|
 | **0** | Cimientos, Serena moviéndose, medidor | — | ✅ |
-| **0b** | Medir en el HONOR | 1 | ⏳ cuando esté el teléfono |
+| **0b** | Medir en el HONOR | 1 | ✅ 60 fps sin margen; el terreno es el 37 % |
 | **1** | Serena completa: movimiento avanzado y combate | 4–5 | ⬜ |
 | **2** | Enemigos, director de combate y el guardián | 4–5 | ⬜ |
 | **3** | El marco del juego: arranque, menús, guardado, audio | 3–4 | ⬜ |

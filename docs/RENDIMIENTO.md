@@ -87,17 +87,42 @@ Todo en `ProjectSetup.cs`, con el motivo al lado.
 
 ## Resultados
 
-### Prueba 1 — ¿Unity rinde más que Godot en el mismo teléfono?
+### Prueba 1 — 2026-09-29, HONOR frío (térmico 0–1, batería 38–40 °C)
 
-*Pendiente de medir en el teléfono.* Referencia de Godot en el sitio de
-arranque: **35-44 fps** antes de la cuarta pasada y **57,7 fps jugando** después
-de quitarle las muestras de cubemap al terreno, con picos del 4,6 % por encima
-de 20 ms.
+Compilación de desarrollo, escena `PerfTest`, punto de medida fijo. La deriva
+de la referencia entre la primera y la última medida fue **+0,1 %**: las filas
+son comparables.
 
-| Fila | fps | p99 ms | GPU ms | CPU ms | batches | térmico |
+| Fila | fps | p99 ms | >20 ms | GPU ms | CPU ms | tris |
 |---|---|---|---|---|---|---|
-| referencia | | | | | | |
-| sin terreno | | | | | | |
-| sin decorado | | | | | | |
-| sin sombras | | | | | | |
-| sin personaje | | | | | | |
+| referencia (media de 4) | 55–60 | 16,7–33 | 0–8 % | **16,6–17,2** | 16,7–18,1 | 159k |
+| sin terreno | 60 | — | — | 10,5 | — | — |
+| sin decorado | 59,7 | 16,7 | 0,2 % | 12,5 | 16,7 | 85k |
+| sin sombras | 59,9 | 16,7 | 0 % | 14,1 | 16,7 | 134k |
+| sin personaje | 59,9 | 16,7 | 0 % | 13,7 | 16,7 | 84k |
+
+**Arranque en frío** (abrir la app → escena lista): **4,1 s**, dos veces. En
+Godot eran 15 s del toque en JUGAR al nivel listo (no es la misma medida: aquí
+todavía no hay enemigos ni interfaz completa).
+
+**Qué dice:**
+
+- **Va a 60 fps en el sitio canónico, pero sin margen**: la GPU gasta 16,6 ms
+  de los 16,7 disponibles, y en dos de las cuatro referencias hay un 5–8 % de
+  fotogramas por encima de 20 ms. Godot daba 57,7 fps en su sitio de arranque:
+  Unity está **al nivel o algo mejor, no muy por encima**. La diferencia la
+  tiene que dar el horneado, que aquí todavía no llega al terreno.
+- **El terreno es lo más caro: 6,1 ms (37 %)**, igual que en Godot. Confirma
+  que la primera tarea de rendimiento es el **shader toon de terreno con luz
+  horneada** (U5).
+- **El decorado cuesta 4,4 ms** con ~1.600 props: revisar distancia de
+  dibujado de lo menudo y la oclusión horneada.
+- **Serena sola cuesta 3,1 ms y 75.000 triángulos**: sus 25k se dibujan tres
+  veces (imagen, contorno, sombra) y ocupa mucha pantalla de cerca. Candidatos:
+  contorno por nivel de detalle y un LOD de 12k para cuando está lejos.
+- **Las sombras, 3 ms**: bajar el alcance a 20–25 m o la resolución a 1024.
+- **Triángulos por encima del presupuesto** (159k frente a 150k).
+- Los contadores de batches salen a 0 en el teléfono (Vulkan): medir draw
+  calls con el Frame Debugger conectado.
+
+**Pendiente de medir en el banco:** MSAA 4x frente a nada, y FSR a 0,85.
