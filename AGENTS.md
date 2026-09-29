@@ -1,6 +1,8 @@
 # Instrucciones para agentes — Sailor Moon (Unity)
 
-> Léelo entero antes de tocar nada. Después, [`docs/ESTADO.md`](docs/ESTADO.md).
+> Léelo entero antes de tocar nada. Después, [`docs/ESTADO.md`](docs/ESTADO.md)
+> y, para cualquier cosa de diseño, historia o contenido,
+> [`docs/juego/00-BIBLIA.md`](docs/juego/00-BIBLIA.md) (manda sobre todo lo demás).
 
 ## Qué es
 

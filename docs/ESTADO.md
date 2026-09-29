@@ -1,8 +1,10 @@
 # ESTADO DEL PROYECTO — empieza por aquí
 
-> **Última actualización:** 2026-09-29 · **Decidido: el juego se hace en Unity.**
-> Cimientos montados y Serena jugable en el Mac. **El plan completo está en
-> [`PLAN.md`](PLAN.md)**; lo siguiente es la Fase 1 (Serena completa).
+> **Última actualización:** 2026-09-29 · **Diseño rehecho: ciudad abierta.**
+> El juego ya no es una fila de niveles: es Juuban con barrios abiertos, 30
+> misiones de la gente, minijuegos, álbum, armario y una historia con lore.
+> **Todo en [`juego/00-BIBLIA.md`](juego/00-BIBLIA.md)**; el orden de trabajo, en
+> [`juego/09-ROADMAP.md`](juego/09-ROADMAP.md). Lo siguiente: Fase 1 (Serena completa).
 
 ## 1. Qué es
 
@@ -55,17 +57,20 @@ rehace **en el editor**, reutilizando todos los assets y lo aprendido.
 
 ### Lo siguiente
 
-Según [`PLAN.md`](PLAN.md):
+Según [`juego/09-ROADMAP.md`](juego/09-ROADMAP.md):
 
-1. **Fase 1 — Serena completa**: doble salto, cornisas, combo, especial,
-   transformación y vida, en una escena de combate con muñecos.
-2. **Fase 0b** en cuanto esté el teléfono: medir con el banco.
+1. **Fase 1 — Serena completa**, empezando por el **terreno toon con luz
+   horneada** (el terreno es el 37 % del fotograma medido en el HONOR).
+2. **Guiones pendientes** (capítulos 2–6, interludios, misiones): se escriben
+   antes de la fase de cada barrio.
 
 ## 3. Documentos
 
 | Documento | Qué tiene |
 |---|---|
-| [`PLAN.md`](PLAN.md) | ⭐ **El plan**: fases 0–8, qué entra en cada una y cuándo está hecha |
+| [`juego/00-BIBLIA.md`](juego/00-BIBLIA.md) | ⭐⭐ **El diseño del juego**: visión, estructura, índice de lore, mundo, jugabilidad, historia, personajes, misiones, actividades, contenido y roadmap |
+| [`juego/09-ROADMAP.md`](juego/09-ROADMAP.md) | ⭐ **El orden de trabajo**: fases, hitos para la prima, carriles de producción |
+| [`PLAN.md`](PLAN.md) | Plan anterior (niveles en fila), sustituido por el roadmap |
 | [`CONTROLES.md`](CONTROLES.md) | Controles de PC, mando y móvil; cómo jugar en el Mac |
 | [`../AGENTS.md`](../AGENTS.md) | ⭐ Reglas del proyecto y cómo trabajar con Unity desde un agente |
 | [`ARQUITECTURA.md`](ARQUITECTURA.md) | ⭐ Por qué el mundo se hace en el editor; piezas, carpetas, código, render |
@@ -74,7 +79,7 @@ Según [`PLAN.md`](PLAN.md):
 | [`ESCENARIOS.md`](ESCENARIOS.md) | Receta para construir un nivel en el editor |
 | [`TRAMPAS-UNITY.md`](TRAMPAS-UNITY.md) | ⭐ Fallos ya pisados en este proyecto |
 | [`aprendido/LECCIONES-GODOT.md`](aprendido/LECCIONES-GODOT.md) | ⭐ Las 133 trampas de Godot, destiladas a lo que sigue valiendo |
-| [`diseno/`](diseno/) | Diseño heredado: GDD, guion, reparto, combate, audio, menús, vidas, jefe… |
+| [`diseno/`](diseno/) | Diseño heredado de Godot. **Manda `juego/` si se contradicen**; sigue valiendo para los números del combate, el audio y el pipeline |
 
 ## 4. Nota legal
 

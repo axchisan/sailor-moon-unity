@@ -1,3 +1,7 @@
+> ⚠️ **Sustituido el 2026-09-29 por [`juego/09-ROADMAP.md`](juego/09-ROADMAP.md)**,
+> tras rediseñar el juego como ciudad abierta ([`juego/00-BIBLIA.md`](juego/00-BIBLIA.md)).
+> Se conserva como historia: el plan de niveles en fila que había antes.
+
 # Plan de desarrollo
 
 > **Decidido el 2026-09-29:** el juego se construye en Unity. Este plan lleva
