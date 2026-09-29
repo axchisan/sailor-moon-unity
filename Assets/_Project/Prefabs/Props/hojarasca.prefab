@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &9024092220993605604
+--- !u!1 &7621504551630169875
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,7 +8,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6650774200524753536}
+  - component: {fileID: 856465136920848477}
   m_Layer: 0
   m_Name: hojarasca
   m_TagString: Untagged
@@ -16,29 +16,29 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 21
   m_IsActive: 1
---- !u!4 &6650774200524753536
+--- !u!4 &856465136920848477
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9024092220993605604}
+  m_GameObject: {fileID: 7621504551630169875}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6001987053578461474}
+  - {fileID: 2216294251375679467}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &6107424329118828233
+--- !u!1001 &1822658898172162048
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 6650774200524753536}
+    m_TransformParent: {fileID: 856465136920848477}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 328b21d44c2d04778ac27cb2db191bbc, type: 3}
       propertyPath: m_LocalPosition.x
@@ -97,8 +97,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 328b21d44c2d04778ac27cb2db191bbc, type: 3}
---- !u!4 &6001987053578461474 stripped
+--- !u!4 &2216294251375679467 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 328b21d44c2d04778ac27cb2db191bbc, type: 3}
-  m_PrefabInstance: {fileID: 6107424329118828233}
+  m_PrefabInstance: {fileID: 1822658898172162048}
   m_PrefabAsset: {fileID: 0}

@@ -298,14 +298,16 @@ namespace SailorMoon.EditorTools.Sandbox
         {
             var specs = new[]
             {
-                new PropSpec("CherryTree", 200, 6, 75, 0.9f, 1.3f, 5f),
-                new PropSpec("arbol_cerezo_lejos", 160, 80, 112, 1.2f, 1.8f, 0),
+                // La escala real la da la importación (Settings/WorldScale.asset);
+                // aquí solo variación natural, ±10–15 %.
+                new PropSpec("CherryTree", 140, 7, 75, 0.9f, 1.15f, 6f),
+                new PropSpec("arbol_cerezo_lejos", 120, 80, 112, 0.9f, 1.15f, 0),
                 new PropSpec("arbusto", 220, 4, 78),
                 new PropSpec("seto_bajo", 80, 4, 70),
-                new PropSpec("mata_hierba", 450, 3, 80, 0.8f, 1.3f, 2.8f, false),
+                new PropSpec("mata_hierba", 450, 3, 80, 0.85f, 1.15f, 2.8f, false),
                 new PropSpec("macizo_flores", 90, 4, 60, 0.9f, 1.2f, 3f, false),
-                new PropSpec("roca", 120, 3, 90, 0.7f, 1.5f),
-                new PropSpec("roca_grande", 40, 10, 95, 0.8f, 1.6f, 6f),
+                new PropSpec("roca", 120, 3, 90, 0.7f, 1.4f),
+                new PropSpec("roca_grande", 40, 10, 95, 0.8f, 1.3f, 6f),
                 new PropSpec("tocon", 30, 5, 75),
                 new PropSpec("piedrecitas", 100, 3, 70, 0.8f, 1.2f, 2.8f, false),
                 new PropSpec("ramitas", 60, 3, 70, 0.8f, 1.2f, 2.8f, false),
@@ -493,15 +495,18 @@ namespace SailorMoon.EditorTools.Sandbox
             var vcam = vGo.AddComponent<CinemachineCamera>();
             vcam.Follow = target;
             vcam.LookAt = target;
-            vcam.Lens.FieldOfView = 55f;
+            // El campo de visión lo pone AdaptiveLens según la pantalla.
             var orbit = vGo.AddComponent<CinemachineOrbitalFollow>();
             orbit.OrbitStyle = CinemachineOrbitalFollow.OrbitStyles.Sphere;
-            orbit.Radius = 5.5f;
+            // 5 m y 14° de inclinación: Serena ocupa ~45 % del alto de la
+            // pantalla y se ve el suelo hasta el horizonte (docs/ESCALA.md §4).
+            orbit.Radius = 5f;
             orbit.HorizontalAxis.Wrap = true;
             orbit.VerticalAxis.Range = new Vector2(-10f, 55f);
-            orbit.VerticalAxis.Value = 16f;
-            orbit.VerticalAxis.Center = 16f;
+            orbit.VerticalAxis.Value = 14f;
+            orbit.VerticalAxis.Center = 14f;
             vGo.AddComponent<CinemachineRotationComposer>();
+            vGo.AddComponent<AdaptiveLens>();
             var deocc = vGo.AddComponent<CinemachineDeoccluder>();
             deocc.CollideAgainst = LayerMask.GetMask("Default");
             var look = vGo.AddComponent<CameraLook>();

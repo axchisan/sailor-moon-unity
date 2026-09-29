@@ -138,3 +138,30 @@ salto entero con su propio aterrizaje. Se midió con la altura del cuerpo
 importar. **Antes de montar un estado con un clip nuevo de Mixamo, medir su
 `RootT.y`** para ver qué hace de verdad (la herramienta está en la sesión del
 2026-09-29: muestrear la curva con `AnimationUtility.GetEditorCurve`).
+
+### U12. Dentro de una regla de importación no se pueden cargar otros assets
+
+**Síntoma:** la tabla de escalas calculaba bien, pero los modelos se quedaban a
+escala 1 y la consola decía «no está en la tabla» de modelos que sí estaban.
+
+**Causa:** Unity 6 importa modelos en procesos paralelos, y ahí
+`AssetDatabase.LoadAssetAtPath` no carga otros assets: devuelve nada, en
+silencio.
+
+**Arreglo:** la herramienta de editor escribe el valor en el importador de cada
+modelo (`importer.globalScale` + `SaveAndReimport`): queda en su `.meta`. Desde la
+regla, como mucho se lee el archivo del disco (`File.ReadAllText`).
+**Regla:** un `AssetPostprocessor` solo decide con lo que tiene su propio archivo.
+
+### U13. Cinemachine manda sobre la cámara, y trae 0,1 → 5.000 m
+
+La `Camera` puede decir otra cosa: la lente de la `CinemachineCamera` la pisa en
+cada fotograma. Por defecto trae recorte de 0,1 a 5.000 m (poca precisión de
+profundidad, todo el mapa en cola de dibujo). Lo fija `AdaptiveLens` junto al
+campo de visión.
+
+### U14. `GetComponent` devuelve un «nulo falso» que `is { }` no detecta
+
+En el editor, un componente que no existe devuelve un objeto que compara igual a
+`null` con `==`, pero **no** con el patrón `is { } x` de C#. Usar
+`TryGetComponent(out var x)`.

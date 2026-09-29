@@ -1,0 +1,179 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3eac4cfb4d3184eb6bbd1beb3f4d2bf5, type: 3}
+  m_Name: WorldScale
+  m_EditorClassIdentifier: SailorMoon.Editor::SailorMoon.EditorTools.Import.WorldScaleTable
+  entries:
+  - model: arbol_cerezo
+    targetHeight: 7
+    reference: "Cerezo Somei-yoshino de parque: 6\u20139 m de alto, copa de 6\u20138 m"
+    importScale: 1.9010123
+  - model: arbol_cerezo_lejos
+    targetHeight: 7
+    reference: 'Nivel de detalle lejano del anterior: TIENE que medir lo mismo'
+    importScale: 1.9010123
+  - model: cerezo_gigante
+    targetHeight: 14
+    reference: Cerezo centenario singular (p. ej. Miharu Takizakura, 13 m)
+    importScale: 1.3742874
+  - model: arbusto
+    targetHeight: 1
+    reference: "Arbusto de jard\xEDn: 0,8\u20131,2 m"
+    importScale: 1.165501
+  - model: seto_bajo
+    targetHeight: 0.8
+    reference: "Seto bajo de parque: 0,6\u20130,9 m"
+    importScale: 1.2326658
+  - model: mata_hierba
+    targetHeight: 0.35
+    reference: "Mata de hierba alta: 0,3\u20130,4 m"
+    importScale: 0.6363637
+  - model: macizo_flores
+    targetHeight: 0.45
+    reference: "Macizo de flores de parterre: 0,3\u20130,5 m"
+    importScale: 0.9742235
+  - model: arbusto_bonsai
+    targetHeight: 0.6
+    reference: "Bons\xE1i en maceta grande"
+    importScale: 0.9904545
+  - model: coral_marino
+    targetHeight: 0.4
+    reference: "Coral de adorno (bah\xEDa)"
+    importScale: 1.0778712
+  - model: tocon
+    targetHeight: 0.5
+    reference: "Toc\xF3n de \xE1rbol talado: 0,3\u20130,6 m"
+    importScale: 0.7227629
+  - model: nenufar
+    targetHeight: 0.15
+    reference: "Nen\xFAfar con flor sobre el agua: 0,1\u20130,2 m"
+    importScale: 0.5836574
+  - model: roca
+    targetHeight: 0.55
+    reference: "Roca suelta de jard\xEDn"
+    importScale: 0.98566306
+  - model: roca_grande
+    targetHeight: 2
+    reference: "Pe\xF1asco de jard\xEDn japon\xE9s: 1,5\u20132,5 m"
+    importScale: 1.0141318
+  - model: piedrecitas
+    targetHeight: 0.12
+    reference: "Grupo de piedras peque\xF1as"
+    importScale: 0.9999996
+  - model: ramitas
+    targetHeight: 0.05
+    reference: "Ramitas ca\xEDdas"
+    importScale: 1.1111091
+  - model: hojarasca
+    targetHeight: 0.03
+    reference: "Hojas ca\xEDdas"
+    importScale: 1.0416646
+  - model: banco_parque
+    targetHeight: 0.9
+    reference: "Banco con respaldo: asiento a 0,45 m, respaldo a 0,8\u20130,9 m, 1,6 m de largo"
+    importScale: 0.9473683
+  - model: papelera
+    targetHeight: 0.85
+    reference: "Papelera de parque: 0,8\u20131,0 m"
+    importScale: 1.1333333
+  - model: farol_piedra
+    targetHeight: 2
+    reference: "T\u014Dr\u014D (farol de piedra) de parque o templo: 1,8\u20132,5 m"
+    importScale: 1.1049724
+  - model: farolillo
+    targetHeight: 3.6
+    reference: "Farola de parque: 3,5\u20134 m"
+    importScale: 1.714286
+  - model: cartel_flechas
+    targetHeight: 2.3
+    reference: "Poste indicador: 2,2\u20132,5 m"
+    importScale: 1.0454546
+  - model: valla_madera
+    targetHeight: 1
+    reference: "Valla de madera de parque: 0,9\u20131,1 m"
+    importScale: 0.909091
+  - model: guirnalda
+    targetHeight: 2.7
+    reference: Poste de guirnalda de farolillos de feria
+    importScale: 0.99999976
+  - model: fuente_piedra
+    targetHeight: 1.4
+    reference: "Fuente de plaza: pil\xF3n 0,5 m, surtidor 1,2\u20131,6 m"
+    importScale: 0.9695289
+  - model: mesa_sombrilla
+    targetHeight: 2.4
+    reference: "Mesa con sombrilla de terraza: 2,2\u20132,5 m"
+    importScale: 1.0126584
+  - model: puesto_dulces
+    targetHeight: 3.3
+    reference: "Puesto de feria (yatai): 2,8\u20133,5 m"
+    importScale: 0.9969789
+  - model: maceta
+    targetHeight: 0.9
+    reference: Macetero grande con planta
+    importScale: 0.9453781
+  - model: matera
+    targetHeight: 0.75
+    reference: Jardinera alargada con flores
+    importScale: 0.98167545
+  - model: estatua_gato
+    targetHeight: 1.4
+    reference: Estatua de gato de la suerte sobre pedestal
+    importScale: 0.9859154
+  - model: columpio
+    targetHeight: 2.4
+    reference: "Columpio infantil: travesa\xF1o a 2,2\u20132,5 m"
+    importScale: 1.0390925
+  - model: tobogan
+    targetHeight: 2.3
+    reference: "Tobog\xE1n infantil: plataforma a 1,5 m, barandilla a 2,3 m"
+    importScale: 1.0383747
+  - model: puente_madera
+    targetHeight: 2.79
+    reference: Pasarela de 14 m; los postes bajan dentro del agua (no se cambia)
+    importScale: 1.0017948
+  - model: torii
+    targetHeight: 7
+    reference: "Torii de santuario grande como el Hikawa: 6\u20139 m"
+    importScale: 1.2939003
+  - model: portal_antiguo
+    targetHeight: 4.1
+    reference: "Portal m\xE1gico (fantas\xEDa): a la escala del guardi\xE1n de 3,7 m"
+    importScale: 0.99273604
+  - model: pagoda_lejana
+    targetHeight: 32
+    reference: "Pagoda de cinco pisos: 30\u201350 m (silueta de fondo)"
+    importScale: 1.8285717
+  - model: montana_lejana
+    targetHeight: 18
+    reference: "Silueta de fondo: su tama\xF1o lo da la distancia a la que se ponga (no es una monta\xF1a a escala)"
+    importScale: 0.9999999
+  - model: estrella_sueno
+    targetHeight: 0.5
+    reference: "Estrella de Sue\xF1o: se coge con las dos manos; visible sin ser un mueble"
+    importScale: 0.5527864
+  - model: espada_uranus
+    targetHeight: 0.95
+    reference: "Espada del Talism\xE1n: 0,9\u20131 m"
+    importScale: 1.2541938
+  - model: mariposa
+    targetHeight: 0.08
+    reference: "Mariposa (10 cm de envergadura, algo m\xE1s grande para que se vea)"
+    importScale: 0.6153846
+  - model: pajarillo
+    targetHeight: 0.15
+    reference: "Gorri\xF3n: 0,15 m"
+    importScale: 0.65861684
+  - model: losa_sendero
+    targetHeight: 0
+    reference: 'Losa de sendero de 0,75 m de lado: plana, se mide por el ancho'
+    importScale: 1

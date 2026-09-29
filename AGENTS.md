@@ -31,11 +31,14 @@ dependencia inyectada.
 4. **Configuración como código.** Ajustes del proyecto en
    `ProjectSetup.cs`, reglas de importación en `ModelImportRules.cs`. Nadie
    toca un importador o un ajuste a mano sin reflejarlo ahí.
-5. **Los assets del proyecto de Godot entran solo por**
+5. **Todo mide lo que mediría de verdad** ([`docs/ESCALA.md`](docs/ESCALA.md)):
+   ningún modelo entra en un escenario sin su fila en la tabla de escalas y sin
+   pasar por la sala de escala.
+6. **Los assets del proyecto de Godot entran solo por**
    `tools/importar_desde_godot.py`.
-6. **Antes de dar algo por hecho, verifícalo** en el editor (consola sin
+7. **Antes de dar algo por hecho, verifícalo** en el editor (consola sin
    errores, captura) o en el teléfono.
-7. **Al cerrar una fase, APK al teléfono** para que el usuario lo pruebe.
+8. **Al cerrar una fase, APK al teléfono** para que el usuario lo pruebe.
 
 ## Trabajar con Unity desde un agente (MCP)
 

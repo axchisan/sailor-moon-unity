@@ -13,6 +13,11 @@ namespace SailorMoon.Player
         static readonly int Grounded = Animator.StringToHash("Grounded");
         static readonly int VerticalSpeed = Animator.StringToHash("VerticalSpeed");
         static readonly int Jump = Animator.StringToHash("Jump");
+        static readonly int LocomotionRate = Animator.StringToHash("LocomotionRate");
+
+        /// Velocidad a la que la animación de correr no patina (medida sobre
+        /// el clip, docs/ESCALA.md §6). Por encima, se reproduce más rápido.
+        public const float RunClipSpeed = 3.9f;
 
         [SerializeField] Animator _animator;
         [Tooltip("Suavizado del parámetro de velocidad, para que el cambio andar/correr no dé tirones.")]
@@ -33,7 +38,11 @@ namespace SailorMoon.Player
 
         void LateUpdate()
         {
-            _animator.SetFloat(Speed, _motor.Speed01, _speedDamp, Time.deltaTime);
+            // En m/s, no en fracción: los umbrales de la mezcla son las
+            // velocidades naturales de cada clip, así los pies no patinan.
+            float speed = _motor.PlanarSpeed;
+            _animator.SetFloat(Speed, speed, _speedDamp, Time.deltaTime);
+            _animator.SetFloat(LocomotionRate, Mathf.Max(1f, speed / RunClipSpeed));
             _animator.SetBool(Grounded, _motor.IsGrounded);
             _animator.SetFloat(VerticalSpeed, _motor.VerticalSpeed);
         }

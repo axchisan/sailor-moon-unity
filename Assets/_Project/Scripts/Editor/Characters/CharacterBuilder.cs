@@ -38,9 +38,11 @@ namespace SailorMoon.EditorTools.Characters
             ctrl.AddParameter("Grounded", AnimatorControllerParameterType.Bool);
             ctrl.AddParameter("VerticalSpeed", AnimatorControllerParameterType.Float);
             ctrl.AddParameter("Jump", AnimatorControllerParameterType.Trigger);
+            ctrl.AddParameter("LocomotionRate", AnimatorControllerParameterType.Float);
             // `parameters` devuelve una copia: hay que reasignar el array.
             var ps = ctrl.parameters;
             ps.First(p => p.name == "Grounded").defaultBool = true;
+            ps.First(p => p.name == "LocomotionRate").defaultFloat = 1f;
             ctrl.parameters = ps;
 
             var sm = ctrl.layers[0].stateMachine;
@@ -48,9 +50,14 @@ namespace SailorMoon.EditorTools.Characters
             var loco = ctrl.CreateBlendTreeInController("Locomotion", out BlendTree tree, 0);
             tree.blendParameter = "Speed";
             tree.useAutomaticThresholds = false;
+            // Umbrales en m/s = la velocidad a la que cada clip no patina,
+            // medida sobre el propio clip (docs/ESCALA.md §6).
             tree.AddChild(Clip("idle"), 0f);
-            tree.AddChild(Clip("walk"), 0.37f); // 2,4 m/s de 6,5: andar
-            tree.AddChild(Clip("run"), 1f);
+            tree.AddChild(Clip("walk"), 1.5f);
+            tree.AddChild(Clip("run"), PlayerAnimator.RunClipSpeed);
+            // Más rápido que el clip de correr: se acelera la animación.
+            loco.speedParameter = "LocomotionRate";
+            loco.speedParameterActive = true;
             sm.defaultState = loco;
 
             var jumpStart = State(sm, "JumpStart", "jump_start", new Vector3(300, 120));
@@ -89,7 +96,7 @@ namespace SailorMoon.EditorTools.Characters
 
             // Si aterriza corriendo, no se para a amortiguar: sigue.
             var landRun = land.AddTransition(loco);
-            landRun.AddCondition(AnimatorConditionMode.Greater, 0.3f, "Speed");
+            landRun.AddCondition(AnimatorConditionMode.Greater, 1f, "Speed"); // m/s: ya anda
             landRun.duration = 0.1f;
             var landIdle = land.AddTransition(loco);
             landIdle.hasExitTime = true;
@@ -146,9 +153,10 @@ namespace SailorMoon.EditorTools.Characters
 
             var root = new GameObject(name);
             var cc = root.AddComponent<CharacterController>();
-            cc.height = 1.5f;
+            // Cápsula a la estatura de Serena (1,55 m, docs/ESCALA.md §2).
+            cc.height = 1.55f;
             cc.radius = 0.28f;
-            cc.center = new Vector3(0, 0.77f, 0);
+            cc.center = new Vector3(0, 0.8f, 0);
             cc.stepOffset = 0.35f;
             cc.slopeLimit = 50f;
             cc.skinWidth = 0.03f;
@@ -158,7 +166,9 @@ namespace SailorMoon.EditorTools.Characters
 
             var target = new GameObject("CameraTarget").transform;
             target.SetParent(root.transform, false);
-            target.localPosition = new Vector3(0, 1.25f, 0);
+            // La cámara mira al pecho, no a la cintura: con el objetivo bajo, el
+            // mundo se ve desde abajo y parece más pequeño.
+            target.localPosition = new Vector3(0, 1.35f, 0);
 
             var visual = (GameObject)PrefabUtility.InstantiatePrefab(model);
             visual.name = "Model";

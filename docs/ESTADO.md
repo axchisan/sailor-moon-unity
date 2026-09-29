@@ -77,6 +77,7 @@ Según [`juego/09-ROADMAP.md`](juego/09-ROADMAP.md):
 | [`RENDIMIENTO.md`](RENDIMIENTO.md) | ⭐ Presupuestos, cómo se mide en el teléfono, decisiones de render y resultados |
 | [`PIPELINE-ASSETS.md`](PIPELINE-ASSETS.md) | Cómo entra cada tipo de asset y qué hace Unity con él |
 | [`ESCENARIOS.md`](ESCENARIOS.md) | Receta para construir un nivel en el editor |
+| [`ESCALA.md`](ESCALA.md) | ⭐ **El estándar de tamaños**: cuánto mide cada cosa, la cámara, las velocidades y cómo entra un modelo nuevo |
 | [`TRAMPAS-UNITY.md`](TRAMPAS-UNITY.md) | ⭐ Fallos ya pisados en este proyecto |
 | [`aprendido/LECCIONES-GODOT.md`](aprendido/LECCIONES-GODOT.md) | ⭐ Las 133 trampas de Godot, destiladas a lo que sigue valiendo |
 | [`diseno/`](diseno/) | Diseño heredado de Godot. **Manda `juego/` si se contradicen**; sigue valiendo para los números del combate, el audio y el pipeline |

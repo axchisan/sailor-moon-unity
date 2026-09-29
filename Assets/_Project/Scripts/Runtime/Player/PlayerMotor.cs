@@ -16,10 +16,12 @@ namespace SailorMoon.Player
     public class PlayerMotor : MonoBehaviour
     {
         [Header("Andar")]
-        [SerializeField] float _runSpeed = 6.5f;
+        [Tooltip("m/s. La animación de correr da 3,9 m/s de zancada; por encima se acelera en proporción (docs/ESCALA.md §6).")]
+        [SerializeField] float _runSpeed = 4.8f;
         [Tooltip("Por debajo de este empuje del joystick, anda en vez de correr.")]
         [SerializeField, Range(0, 1)] float _walkThreshold = 0.55f;
-        [SerializeField] float _walkSpeed = 2.4f;
+        [Tooltip("m/s. La animación de andar da 1,5 m/s: a esa velocidad los pies no patinan.")]
+        [SerializeField] float _walkSpeed = 1.5f;
         [SerializeField] float _acceleration = 40f;
         [Tooltip("Grados por segundo al girar hacia donde va.")]
         [SerializeField] float _turnSpeed = 720f;
@@ -49,6 +51,8 @@ namespace SailorMoon.Player
         public float VerticalSpeed => _verticalSpeed;
         /// 0 quieta, 0,5 andando, 1 corriendo: lo que lee la animación.
         public float Speed01 => _planarVelocity.magnitude / _runSpeed;
+        /// Velocidad horizontal real en m/s: lo que lee la animación.
+        public float PlanarSpeed => _planarVelocity.magnitude;
         /// Se dispara el fotograma en que despega.
         public event System.Action Jumped;
         public event System.Action Landed;

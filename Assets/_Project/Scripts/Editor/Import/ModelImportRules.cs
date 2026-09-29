@@ -22,7 +22,7 @@ namespace SailorMoon.EditorTools.Import
     /// </summary>
     class ModelImportRules : AssetPostprocessor
     {
-        const uint Version = 6;
+        const uint Version = 7;
         const string Characters = "Assets/_Project/Art/Characters/";
         const string Animations = "Assets/_Project/Art/Animations/Humanoid/";
         const string Props = "Assets/_Project/Art/Props/";
@@ -108,7 +108,23 @@ namespace SailorMoon.EditorTools.Import
                 // («madera», «piedra»…) se enlaza a ella en vez de importarse.
                 foreach (var (name, mat) in SurfaceLibrary.All())
                     importer.AddRemap(new AssetImporter.SourceAssetIdentifier(typeof(Material), name), mat);
+                ApplyWorldScale(importer);
             }
+        }
+
+        /// <summary>
+        /// La escala de los props NO se decide aquí: la escribe «Normalizar
+        /// escalas» (WorldScaleTable) en la configuración del importador, y
+        /// viaja en el .meta de cada modelo. Leer la tabla desde aquí no
+        /// funciona: Unity 6 importa modelos en procesos paralelos donde
+        /// AssetDatabase no carga otros assets (TRAMPAS-UNITY U12). Aquí solo se
+        /// avisa si un prop no tiene su altura real declarada.
+        /// </summary>
+        void ApplyWorldScale(ModelImporter importer)
+        {
+            if (!WorldScaleTable.IsListed(Path.GetFileNameWithoutExtension(assetPath)))
+                Debug.LogWarning($"[Escala] {Path.GetFileName(assetPath)} no tiene altura real en la tabla de " +
+                                 "escalas (Settings/WorldScale.asset, docs/ESCALA.md): se queda con la escala que tenga.");
         }
 
         bool IsFromMixamo() => assetPath.StartsWith(Animations) ||
