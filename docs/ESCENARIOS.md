@@ -14,8 +14,9 @@ Todo a mano, en el editor. Esta es la receta; la escena de prueba
    `Art/Terrain/Surfaces/` (hierba, hierba lejana, camino, roca). Una capa
    nueva = una receta nueva (clic derecho ▸ *Create ▸ Sailor Moon ▸ Superficie
    de terreno*, retocar colores, **Hornear**).
-4. Ajustes que ya se probaron: `Pixel Error` 8, `Basemap Distance` 90, `Draw
-   Instanced` activado, **sin sombra propia** (`Cast Shadows: Off`).
+4. Ajustes que ya se probaron: `Pixel Error` 8, *Draw Instanced* desactivado
+   (lo pide TerrainToon), **sin sombra propia** (`Cast Shadows: Off`: el
+   relieve ya va horneado).
 
 > Material del terreno: `Art/Terrain/TerrainToon.mat` (shader
 > `SailorMoon/TerrainToon`): **máximo 4 capas** y *Draw Instanced* desactivado.
