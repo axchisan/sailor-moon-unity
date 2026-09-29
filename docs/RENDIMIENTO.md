@@ -126,3 +126,24 @@ todavía no hay enemigos ni interfaz completa).
   calls con el Frame Debugger conectado.
 
 **Pendiente de medir en el banco:** MSAA 4x frente a nada, y FSR a 0,85.
+
+### Prueba 2 — 2026-09-30, tras la corrección de escala (docs/ESCALA.md)
+
+Mismo sitio y compilación de desarrollo. Teléfono frío (térmico 0, batería
+30–31 °C). Deriva de la referencia: −1,0 %.
+
+| Fila | GPU ms | Ganancia | tris |
+|---|---|---|---|
+| referencia (media de 5) | **15,9** (antes 16,6–17,2) | — | 147k (antes 159k) |
+| sin terreno | 10,1 | +59 % | 140k |
+| sin decorado | 13,1 | +21 % | 84k |
+| sin sombras | 12,4 | +28 % | 122k |
+| sin personaje | 12,3 | +29 % | 72k |
+
+- **0 % de fotogramas por encima de 20 ms en las cinco referencias** (antes, hasta
+  un 8 %). La cámara nueva (75° horizontales en vez de 99°) abarca menos mundo.
+- El decorado baja de 4,4 a 2,8 ms aunque los árboles sean el doble de grandes:
+  hay 140 cerezos en vez de 200 y se ven menos a la vez.
+- **El terreno sigue siendo el 37 %** (5,9 ms): el shader toon con luz horneada
+  sigue siendo lo primero de la Fase 1.
+- Serena pesa algo más (3,5 ms): con la cámara a 5 m ocupa más pantalla.
