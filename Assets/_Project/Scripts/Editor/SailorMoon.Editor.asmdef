@@ -1,0 +1,19 @@
+{
+  "name": "SailorMoon.Editor",
+  "rootNamespace": "SailorMoon.EditorTools",
+  "references": [
+    "SailorMoon.Runtime",
+    "Unity.InputSystem",
+    "Unity.RenderPipelines.Core.Runtime",
+    "Unity.RenderPipelines.Core.Editor",
+    "Unity.RenderPipelines.Universal.Runtime",
+    "Unity.RenderPipelines.Universal.Editor",
+    "Unity.Cinemachine",
+    "UnityEngine.UI",
+    "Unity.AI.Navigation"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "autoReferenced": false
+}

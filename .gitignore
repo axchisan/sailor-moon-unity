@@ -1,0 +1,48 @@
+# --- Unity: todo esto se regenera ---
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+crashlytics-build.properties
+
+# --- IDE ---
+.vs/
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.csproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+
+# --- Builds de Android ---
+*.apk
+*.aab
+*.symbols.zip
+/export/
+
+# --- Sistema ---
+.DS_Store
+Thumbs.db
+
+# --- Material de trabajo que no es del juego ---
+# Originales de hi3d.ai (80 MB a 2 M de triángulos): se regeneran; viven fuera.
+/Fuentes/Originales/
+
+# Capturas de trabajo (MCP)
+/Captures/
+
+# Temporales de la compilación de Android (CMake/Gradle)
+/.utmp/
