@@ -124,3 +124,17 @@ reposo), y sobrescribir esas entradas le dejó una escala humana de **0,06**
 (las demás, 0,94): quedaba hundida en el suelo hasta la falda. Comprobación
 rápida tras tocar un avatar: `Animator.humanScale` tiene que salir cerca de la
 altura de la cadera (0,9 para estas alturas).
+
+### U11. Clips de Mixamo que hacen más de lo que dice su nombre
+
+**Síntoma:** al aterrizar, Serena parecía saltar otra vez.
+
+**Causa:** `land` («Falling To Landing») empieza en el aire, 0,7 m por encima
+de la altura normal, y no toca suelo hasta 0,27 s. `jump_start` («Jump») es un
+salto entero con su propio aterrizaje. Se midió con la altura del cuerpo
+(`RootT.y`) a lo largo de cada clip.
+
+**Arreglo:** `ModelImportRules.Ranges` recorta cada clip al tramo útil al
+importar. **Antes de montar un estado con un clip nuevo de Mixamo, medir su
+`RootT.y`** para ver qué hace de verdad (la herramienta está en la sesión del
+2026-09-29: muestrear la curva con `AnimationUtility.GetEditorCurve`).

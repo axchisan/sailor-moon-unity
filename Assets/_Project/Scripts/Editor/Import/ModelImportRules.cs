@@ -22,7 +22,7 @@ namespace SailorMoon.EditorTools.Import
     /// </summary>
     class ModelImportRules : AssetPostprocessor
     {
-        const uint Version = 5;
+        const uint Version = 6;
         const string Characters = "Assets/_Project/Art/Characters/";
         const string Animations = "Assets/_Project/Art/Animations/Humanoid/";
         const string Props = "Assets/_Project/Art/Props/";
@@ -33,6 +33,24 @@ namespace SailorMoon.EditorTools.Import
         static readonly HashSet<string> Loops = new()
         {
             "idle", "walk", "run", "jump_loop", "ledge_grab", "dizzy", "talk_idle", "thinking",
+        };
+
+        /// <summary>
+        /// Tramo de cada clip que se usa, en segundos del archivo original.
+        ///
+        /// Algunos clips de Mixamo hacen más de lo que dice su nombre, y se
+        /// midió con la altura del cuerpo a lo largo del clip (RootT.y):
+        /// · jump_start («Jump») es un salto ENTERO: sube hasta 0,31 s,
+        ///   aterriza hacia 0,62 s y se incorpora. Del salto solo se usa el
+        ///   impulso; la caída la hace jump_loop y el aterrizaje, land.
+        /// · land («Falling To Landing») EMPIEZA EN EL AIRE: el cuerpo va 0,7 m
+        ///   por encima de lo normal y toca suelo hacia 0,27 s. Entrando desde
+        ///   el principio, al aterrizar se veía otro salto.
+        /// </summary>
+        static readonly Dictionary<string, (float from, float to)> Ranges = new()
+        {
+            ["jump_start"] = (0.08f, 0.33f),
+            ["land"] = (0.27f, 1.07f),
         };
 
         public override uint GetVersion() => Version;
@@ -126,10 +144,16 @@ namespace SailorMoon.EditorTools.Import
             string name = Path.GetFileNameWithoutExtension(assetPath);
 
             var clips = importer.defaultClipAnimations;
+            float fps = importer.importedTakeInfos.Length > 0 ? importer.importedTakeInfos[0].sampleRate : 30f;
             for (int i = 0; i < clips.Length; i++)
             {
                 var c = clips[i];
                 c.name = name;
+                if (Ranges.TryGetValue(name, out var range))
+                {
+                    c.firstFrame = range.from * fps;
+                    c.lastFrame = Mathf.Min(range.to * fps, c.lastFrame);
+                }
                 c.loopTime = Loops.Contains(name);
                 c.loopPose = c.loopTime;
                 c.lockRootRotation = true;

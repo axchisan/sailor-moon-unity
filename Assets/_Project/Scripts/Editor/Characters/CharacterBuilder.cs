@@ -27,8 +27,13 @@ namespace SailorMoon.EditorTools.Characters
         [MenuItem("Sailor Moon/Montaje/Animator de las Sailor")]
         public static AnimatorController BuildController()
         {
-            AssetDatabase.DeleteAsset(ControllerPath);
-            var ctrl = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
+            // Se rehace DENTRO del asset existente: borrarlo y crearlo de nuevo
+            // le cambia el GUID y los prefabs que lo usan se quedan sin él.
+            var ctrl = AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
+            if (ctrl == null)
+                ctrl = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
+            else
+                Clear(ctrl);
             ctrl.AddParameter("Speed", AnimatorControllerParameterType.Float);
             ctrl.AddParameter("Grounded", AnimatorControllerParameterType.Bool);
             ctrl.AddParameter("VerticalSpeed", AnimatorControllerParameterType.Float);
@@ -58,10 +63,15 @@ namespace SailorMoon.EditorTools.Characters
             toJump.duration = 0.05f;
             toJump.canTransitionToSelf = false;
 
+            // Del impulso a la caída: en cuanto el cuerpo empieza a bajar, o
+            // al acabar el clip si el salto fuera más alto que el impulso.
             var startToLoop = jumpStart.AddTransition(jumpLoop);
-            startToLoop.hasExitTime = true;
-            startToLoop.exitTime = 0.8f;
-            startToLoop.duration = 0.1f;
+            startToLoop.AddCondition(AnimatorConditionMode.Less, 0f, "VerticalSpeed");
+            startToLoop.duration = 0.15f;
+            var startEnds = jumpStart.AddTransition(jumpLoop);
+            startEnds.hasExitTime = true;
+            startEnds.exitTime = 0.95f;
+            startEnds.duration = 0.15f;
 
             // Caer de un borde sin haber saltado.
             var fall = loco.AddTransition(jumpLoop);
@@ -83,12 +93,23 @@ namespace SailorMoon.EditorTools.Characters
             landRun.duration = 0.1f;
             var landIdle = land.AddTransition(loco);
             landIdle.hasExitTime = true;
-            landIdle.exitTime = 0.6f;
-            landIdle.duration = 0.15f;
+            landIdle.exitTime = 0.75f;
+            landIdle.duration = 0.2f;
 
             EditorUtility.SetDirty(ctrl);
             AssetDatabase.SaveAssets();
             return ctrl;
+        }
+
+        static void Clear(AnimatorController ctrl)
+        {
+            var sm = ctrl.layers[0].stateMachine;
+            foreach (var t in sm.anyStateTransitions) sm.RemoveAnyStateTransition(t);
+            foreach (var st in sm.states) sm.RemoveState(st.state);
+            foreach (var p in ctrl.parameters) ctrl.RemoveParameter(p);
+            // Los blend trees viejos quedan como sub-assets huérfanos.
+            foreach (var o in AssetDatabase.LoadAllAssetsAtPath(ControllerPath))
+                if (o is BlendTree bt) Object.DestroyImmediate(bt, true);
         }
 
         static AnimatorState State(AnimatorStateMachine sm, string name, string clip, Vector3 pos)
