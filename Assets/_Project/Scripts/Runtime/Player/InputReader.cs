@@ -4,30 +4,45 @@ using UnityEngine.InputSystem;
 namespace SailorMoon.Player
 {
     /// <summary>
-    /// Lo que la jugadora pide, venga de donde venga: teclado, mando o pantalla.
+    /// Lo que la jugadora pide, venga de donde venga: teclado y ratón, mando o
+    /// pantalla táctil.
     ///
     /// Todo el juego lee de aquí, nunca de una tecla ni de un toque directo.
     /// En Godot, mandar una pulsación de tecla desde fuera no movía a la
     /// jugadora porque ella leía acciones (trampa 27); aquí la acción es la
     /// única puerta y los controles táctiles escriben en ella igual que el
     /// teclado.
+    ///
+    /// Controles de PC (los mismos que muestra docs/CONTROLES.md):
+    ///   WASD / flechas   mover            Shift        andar
+    ///   Ratón            cámara (clic en el juego para capturarlo, Esc para soltarlo)
+    ///   Rueda            acercar / alejar la cámara
+    ///   Espacio          saltar           J / clic     atacar
+    ///   R                volver al inicio F1           panel de rendimiento
     /// </summary>
     [DefaultExecutionOrder(-100)]
     public class InputReader : MonoBehaviour
     {
-        [Tooltip("Grados por píxel al arrastrar para mirar (ratón y dedo).")]
-        [SerializeField] float _lookSensitivity = 0.15f;
+        [Tooltip("Grados por píxel de ratón o de dedo.")]
+        [SerializeField] float _lookSensitivity = 0.12f;
         [Tooltip("Grados por segundo con el stick derecho del mando.")]
-        [SerializeField] float _stickLookSpeed = 140f;
+        [SerializeField] float _stickLookSpeed = 160f;
+        [Tooltip("Empuje del joystick al andar con Shift (por debajo del umbral de andar del motor).")]
+        [SerializeField, Range(0.1f, 0.54f)] float _walkPush = 0.45f;
+        [Tooltip("Capturar el ratón al hacer clic en el juego (en PC).")]
+        [SerializeField] bool _lockCursorOnClick = true;
 
-        InputAction _move, _look, _stickLook, _jump, _attack;
+        InputAction _move, _walk, _mouseLook, _dragLook, _stickLook, _zoom, _jump, _attack, _respawn;
 
         /// Dirección de movimiento pedida, en la pantalla: x derecha, y adelante.
         public Vector2 Move { get; private set; }
         /// Giro de cámara pedido en este fotograma, en grados (x yaw, y pitch).
         public Vector2 LookDelta { get; private set; }
+        /// Acercar (+) o alejar (−) la cámara en este fotograma, en pasos.
+        public float Zoom { get; private set; }
         public bool JumpPressed { get; private set; }
         public bool AttackPressed { get; private set; }
+        public bool RespawnPressed { get; private set; }
 
         // Lo que escriben los controles táctiles (TouchControls).
         Vector2 _touchMove, _touchLook;
@@ -36,6 +51,8 @@ namespace SailorMoon.Player
         public void AddTouchLook(Vector2 pixels) => _touchLook += pixels;
         public void PressTouchJump() => _touchJump = true;
         public void PressTouchAttack() => _touchAttack = true;
+
+        static bool CursorCaptured => Cursor.lockState == CursorLockMode.Locked;
 
         void Awake()
         {
@@ -48,13 +65,20 @@ namespace SailorMoon.Player
                 .With("Left", "<Keyboard>/leftArrow").With("Right", "<Keyboard>/rightArrow");
             _move.AddBinding("<Gamepad>/leftStick");
 
-            // Ratón: solo con el botón derecho pulsado, para que el cursor
-            // siga sirviendo para los menús.
-            _look = new InputAction("Look", InputActionType.Value);
-            _look.AddCompositeBinding("OneModifier")
+            _walk = new InputAction("Walk", InputActionType.Button);
+            _walk.AddBinding("<Keyboard>/leftShift");
+            _walk.AddBinding("<Keyboard>/rightShift");
+
+            // Ratón capturado: se mueve y gira la cámara, como en cualquier
+            // juego de PC. Sin capturar: arrastrando con el botón derecho.
+            _mouseLook = new InputAction("MouseLook", InputActionType.Value, "<Mouse>/delta");
+            _dragLook = new InputAction("DragLook", InputActionType.Value);
+            _dragLook.AddCompositeBinding("OneModifier")
                 .With("Modifier", "<Mouse>/rightButton")
                 .With("Binding", "<Mouse>/delta");
             _stickLook = new InputAction("StickLook", InputActionType.Value, "<Gamepad>/rightStick");
+
+            _zoom = new InputAction("Zoom", InputActionType.Value, "<Mouse>/scroll/y");
 
             _jump = new InputAction("Jump", InputActionType.Button);
             _jump.AddBinding("<Keyboard>/space");
@@ -64,39 +88,72 @@ namespace SailorMoon.Player
             _attack.AddBinding("<Keyboard>/j");
             _attack.AddBinding("<Mouse>/leftButton");
             _attack.AddBinding("<Gamepad>/buttonWest");
+
+            _respawn = new InputAction("Respawn", InputActionType.Button);
+            _respawn.AddBinding("<Keyboard>/r");
+            _respawn.AddBinding("<Gamepad>/select");
         }
 
-        void OnEnable()
-        {
-            _move.Enable(); _look.Enable(); _stickLook.Enable(); _jump.Enable(); _attack.Enable();
-        }
+        InputAction[] All => new[] { _move, _walk, _mouseLook, _dragLook, _stickLook, _zoom, _jump, _attack, _respawn };
 
-        void OnDisable()
-        {
-            _move.Disable(); _look.Disable(); _stickLook.Disable(); _jump.Disable(); _attack.Disable();
-        }
-
-        void OnDestroy()
-        {
-            _move.Dispose(); _look.Dispose(); _stickLook.Dispose(); _jump.Dispose(); _attack.Dispose();
-        }
+        void OnEnable() { foreach (var a in All) a.Enable(); }
+        void OnDisable() { foreach (var a in All) a.Disable(); }
+        void OnDestroy() { foreach (var a in All) a.Dispose(); }
 
         // Se lee antes que nadie (orden de ejecución) para que todo el
         // fotograma vea la misma entrada.
         void Update()
         {
-            Vector2 move = _move.ReadValue<Vector2>() + _touchMove;
-            Move = Vector2.ClampMagnitude(move, 1f);
+            HandleCursor(out bool clickUsedToCapture);
 
-            Vector2 look = (_look.ReadValue<Vector2>() + _touchLook) * _lookSensitivity;
+            Vector2 move = _move.ReadValue<Vector2>();
+            if (_walk.IsPressed() && move.sqrMagnitude > 0.01f)
+                move = move.normalized * _walkPush;
+            Move = Vector2.ClampMagnitude(move + _touchMove, 1f);
+
+            Vector2 mouse = CursorCaptured ? _mouseLook.ReadValue<Vector2>() : _dragLook.ReadValue<Vector2>();
+            Vector2 look = (mouse + _touchLook) * _lookSensitivity;
             look += _stickLook.ReadValue<Vector2>() * (_stickLookSpeed * Time.unscaledDeltaTime);
             LookDelta = look;
             _touchLook = Vector2.zero;
 
+            // Un «clic» de rueda vale 120 en Windows y 1 en Mac: solo importa el signo.
+            float scroll = _zoom.ReadValue<float>();
+            Zoom = Mathf.Abs(scroll) > 0.01f ? Mathf.Sign(scroll) : 0f;
+
             JumpPressed = _jump.WasPressedThisFrame() || _touchJump;
-            AttackPressed = _attack.WasPressedThisFrame() || _touchAttack;
+            AttackPressed = (_attack.WasPressedThisFrame() && !clickUsedToCapture) || _touchAttack;
+            RespawnPressed = _respawn.WasPressedThisFrame();
             _touchJump = _touchAttack = false;
+        }
+
+        /// El primer clic en el juego captura el ratón (y no cuenta como
+        /// ataque); Esc lo suelta. En el móvil no hay ratón y no hace nada.
+        void HandleCursor(out bool clickUsedToCapture)
+        {
+            clickUsedToCapture = false;
+            if (!_lockCursorOnClick || Mouse.current == null || Application.isMobilePlatform) return;
+
+            if (CursorCaptured && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+            else if (!CursorCaptured && Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                clickUsedToCapture = true;
+            }
+        }
+
+        void OnApplicationFocus(bool focused)
+        {
+            if (!focused && CursorCaptured)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
         }
     }
 }
-

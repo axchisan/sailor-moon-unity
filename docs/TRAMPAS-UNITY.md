@@ -78,3 +78,18 @@ importar un modelo nuevo, comprobar su altura
 Una build de Android ocupa el hilo principal del editor minutos (IL2CPP la
 primera vez): cualquier otra llamada al MCP espera y puede agotar su tiempo.
 Lanzar la build y consultar su estado cuando acabe; no encadenar otras órdenes.
+
+### U9. La conversión de ejes de Blender, aplicada a Mixamo, pone al personaje de espaldas
+
+**Síntoma:** Serena corre hacia delante mirando hacia atrás. Medido: la raíz
+avanza por +Z y la punta del pie apunta a −Z.
+
+**Causa:** `bakeAxisConversion` convierte los ejes de Blender (−Y adelante,
+Z arriba) a los de Unity. Los FBX de Mixamo ya vienen en los de Unity (+Z
+adelante, Y arriba): convertirlos otra vez los gira 180°.
+
+**Arreglo:** en `ModelImportRules`, la conversión solo para lo que sale de
+Blender (props y personajes convertidos de .glb), nunca para Mixamo. **Al
+importar un modelo de origen nuevo, medir hacia dónde apunta el pie mientras
+anda** (el `bodyRotation` del Animator no sirve para esto: en estos avatares
+sale girado aunque el modelo esté bien).

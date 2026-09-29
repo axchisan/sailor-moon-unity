@@ -73,6 +73,10 @@ namespace SailorMoon.EditorTools
             // medidor los necesita, y los fps solos topan en 60 y no dicen nada.
             PlayerSettings.enableFrameTimingStats = true;
 
+            // Que el juego siga corriendo si se cambia de ventana en el Mac
+            // (y que un agente pueda probarlo con el editor en segundo plano).
+            PlayerSettings.runInBackground = true;
+
             PlayerSettings.defaultInterfaceOrientation = UIOrientation.AutoRotation;
             PlayerSettings.allowedAutorotateToLandscapeLeft = true;
             PlayerSettings.allowedAutorotateToLandscapeRight = true;

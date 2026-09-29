@@ -24,6 +24,8 @@ namespace SailorMoon.UI
         [SerializeField] RectTransform _attackButton;
         [Tooltip("Radio del joystick en píxeles de referencia (1280×720).")]
         [SerializeField] float _stickRadius = 110f;
+        [Tooltip("Mostrar los botones aunque no haya pantalla táctil (para probarlos en el editor).")]
+        [SerializeField] bool _showOnDesktop;
 
         Canvas _canvas;
         int _stickFinger = -1, _lookFinger = -1;
@@ -34,6 +36,11 @@ namespace SailorMoon.UI
             EnhancedTouchSupport.Enable();
             _canvas = GetComponentInParent<Canvas>();
             SetStickVisible(false);
+            // En PC los botones táctiles solo estorban: se juega con teclado,
+            // ratón o mando.
+            bool touch = Application.isMobilePlatform || _showOnDesktop;
+            if (_jumpButton) _jumpButton.gameObject.SetActive(touch);
+            if (_attackButton) _attackButton.gameObject.SetActive(touch);
         }
 
         void OnDisable()

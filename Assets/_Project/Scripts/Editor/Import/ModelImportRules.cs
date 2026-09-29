@@ -22,7 +22,7 @@ namespace SailorMoon.EditorTools.Import
     /// </summary>
     class ModelImportRules : AssetPostprocessor
     {
-        const uint Version = 2;
+        const uint Version = 3;
         const string Characters = "Assets/_Project/Art/Characters/";
         const string Animations = "Assets/_Project/Art/Animations/Humanoid/";
         const string Props = "Assets/_Project/Art/Props/";
@@ -42,7 +42,11 @@ namespace SailorMoon.EditorTools.Import
             var importer = (ModelImporter)assetImporter;
             importer.importCameras = false;
             importer.importLights = false;
-            importer.bakeAxisConversion = true;
+            // La conversión de ejes SOLO para lo que sale de Blender (los .glb
+            // convertidos). Los FBX de Mixamo ya vienen con los ejes de Unity
+            // (Y arriba, +Z adelante); convertirlos otra vez dejaba a Serena
+            // corriendo de espaldas (docs/TRAMPAS-UNITY.md, U9).
+            importer.bakeAxisConversion = !IsFromMixamo();
             importer.isReadable = false;
 
             if (assetPath.StartsWith(Characters))
@@ -83,6 +87,9 @@ namespace SailorMoon.EditorTools.Import
                     importer.AddRemap(new AssetImporter.SourceAssetIdentifier(typeof(Material), name), mat);
             }
         }
+
+        bool IsFromMixamo() => assetPath.StartsWith(Animations) ||
+                                (assetPath.StartsWith(Characters) && IsMixamoCharacter());
 
         bool IsMixamoCharacter()
         {

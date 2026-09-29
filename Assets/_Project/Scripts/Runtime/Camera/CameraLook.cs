@@ -19,6 +19,10 @@ namespace SailorMoon.CameraRig
         [SerializeField] InputReader _input;
         [Tooltip("Invertir el eje vertical.")]
         [SerializeField] bool _invertY;
+        [Tooltip("Distancia mínima y máxima de la cámara (rueda del ratón).")]
+        [SerializeField] Vector2 _radiusRange = new(3f, 9f);
+        [Tooltip("Metros por paso de rueda.")]
+        [SerializeField] float _zoomStep = 0.6f;
 
         CinemachineOrbitalFollow _orbit;
 
@@ -27,6 +31,9 @@ namespace SailorMoon.CameraRig
         void LateUpdate()
         {
             if (_input == null) return;
+            if (_input.Zoom != 0f)
+                _orbit.Radius = Mathf.Clamp(_orbit.Radius - _input.Zoom * _zoomStep, _radiusRange.x, _radiusRange.y);
+
             Vector2 d = _input.LookDelta;
             if (d == Vector2.zero) return;
 

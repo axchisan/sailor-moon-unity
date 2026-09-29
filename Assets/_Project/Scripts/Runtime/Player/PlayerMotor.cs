@@ -35,6 +35,8 @@ namespace SailorMoon.Player
         [SerializeField] float _jumpBuffer = 0.2f;
 
         [SerializeField] Transform _cameraTransform;
+        [Tooltip("Por debajo de esta altura se considera que se ha caído del mundo y vuelve al inicio.")]
+        [SerializeField] float _killHeight = -30f;
 
         CharacterController _controller;
         InputReader _input;
@@ -51,16 +53,40 @@ namespace SailorMoon.Player
         public event System.Action Jumped;
         public event System.Action Landed;
 
+        Vector3 _spawnPosition;
+        Quaternion _spawnRotation;
+
         void Awake()
         {
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<InputReader>();
             if (_cameraTransform == null && Camera.main != null)
                 _cameraTransform = Camera.main.transform;
+            _spawnPosition = transform.position;
+            _spawnRotation = transform.rotation;
+        }
+
+        /// Vuelve al punto de salida. Lo pide la jugadora (R) o salta solo si
+        /// cae del mundo: nunca debe quedarse atascada sin salida (lección de
+        /// Godot, trampas 95 y 104).
+        public void Respawn()
+        {
+            // El CharacterController pisa cualquier posición escrita mientras
+            // está activo: se apaga, se mueve y se enciende.
+            _controller.enabled = false;
+            transform.SetPositionAndRotation(_spawnPosition, _spawnRotation);
+            _controller.enabled = true;
+            _planarVelocity = Vector3.zero;
+            _verticalSpeed = 0f;
         }
 
         void Update()
         {
+            if (_input.RespawnPressed || transform.position.y < _killHeight)
+            {
+                Respawn();
+                return;
+            }
             float dt = Time.deltaTime;
             bool wasGrounded = IsGrounded;
             IsGrounded = _controller.isGrounded;
