@@ -1,9 +1,8 @@
 # ESTADO DEL PROYECTO — empieza por aquí
 
-> **Última actualización:** 2026-09-29 · **Cimientos montados.** Proyecto de
-> Unity creado, assets de Godot traídos, escena de prueba jugable y APK de
-> desarrollo compilado. **Falta medirlo en el teléfono**, que es la pregunta
-> que decide si el remake sigue adelante.
+> **Última actualización:** 2026-09-29 · **Decidido: el juego se hace en Unity.**
+> Cimientos montados y Serena jugable en el Mac. **El plan completo está en
+> [`PLAN.md`](PLAN.md)**; lo siguiente es la Fase 1 (Serena completa).
 
 ## 1. Qué es
 
@@ -23,9 +22,7 @@ rehace **en el editor**, reutilizando todos los assets y lo aprendido.
 |---|---|
 | **0 — Cimientos** | ✅ Proyecto, configuración, MCP, importación, documentación |
 | **0b — Prueba de rendimiento** | 🟡 Escena y APK listos; **falta medir en el HONOR** |
-| 1 — Serena completa (movimiento, combate, transformación) | ⬜ |
-| 2 — Nivel 1 hecho a mano | ⬜ |
-| 3+ — Resto de escenarios e historia | ⬜ |
+| 1–8 | ⬜ Ver [`PLAN.md`](PLAN.md) |
 
 ### Lo que ya funciona
 
@@ -56,23 +53,20 @@ rehace **en el editor**, reutilizando todos los assets y lo aprendido.
   - Panel F1 / tres dedos: fps, p99, CPU y GPU en ms, estado térmico.
   - Banco automático que se lanza por adb e intercala la referencia entre pruebas.
 
-### Lo siguiente, en orden
+### Lo siguiente
 
-1. **Medir en el HONOR** (`RENDIMIENTO.md` §Cómo se mide) y rellenar la tabla.
-   Es la decisión: si Unity no rinde claramente mejor que Godot en el mismo
-   sitio, se vuelve a pensar.
-2. **Jugarlo en el teléfono**: que el joystick, la cámara y el salto se sientan
-   bien a los 8 años.
-3. **Terreno con luz horneada** (U5): probar en 6.7 LTS o hacer el shader toon
-   de terreno. Hoy los árboles no dejan sombra horneada en el suelo.
-4. **Fase 1 — Serena completa:** combo de 3 golpes, especial, transformación,
-   con el ajuste de `diseno/05-COMBATE.md`.
-5. **Nivel 1 a mano**, siguiendo `ESCENARIOS.md`.
+Según [`PLAN.md`](PLAN.md):
+
+1. **Fase 1 — Serena completa**: doble salto, cornisas, combo, especial,
+   transformación y vida, en una escena de combate con muñecos.
+2. **Fase 0b** en cuanto esté el teléfono: medir con el banco.
 
 ## 3. Documentos
 
 | Documento | Qué tiene |
 |---|---|
+| [`PLAN.md`](PLAN.md) | ⭐ **El plan**: fases 0–8, qué entra en cada una y cuándo está hecha |
+| [`CONTROLES.md`](CONTROLES.md) | Controles de PC, mando y móvil; cómo jugar en el Mac |
 | [`../AGENTS.md`](../AGENTS.md) | ⭐ Reglas del proyecto y cómo trabajar con Unity desde un agente |
 | [`ARQUITECTURA.md`](ARQUITECTURA.md) | ⭐ Por qué el mundo se hace en el editor; piezas, carpetas, código, render |
 | [`RENDIMIENTO.md`](RENDIMIENTO.md) | ⭐ Presupuestos, cómo se mide en el teléfono, decisiones de render y resultados |
