@@ -17,8 +17,9 @@ Todo a mano, en el editor. Esta es la receta; la escena de prueba
 4. Ajustes que ya se probaron: `Pixel Error` 8, `Basemap Distance` 90, `Draw
    Instanced` activado, **sin sombra propia** (`Cast Shadows: Off`).
 
-> Hasta que se arregle U5 ([`TRAMPAS-UNITY.md`](TRAMPAS-UNITY.md)), el terreno
-> NO se marca como *Contribute GI*.
+> Material del terreno: `Art/Terrain/TerrainToon.mat` (shader
+> `SailorMoon/TerrainToon`): **máximo 4 capas** y *Draw Instanced* desactivado.
+> Se marca *Contribute GI* y se hornea con `Sailor Moon ▸ Hornear luz`.
 
 ## 2. El recorrido
 
@@ -46,11 +47,11 @@ saltaban y la solución buena fue que la colisión subiera más que la malla.
 
 1. Un sol: `Directional Light`, modo **Mixed**, sombras suaves.
 2. *Window ▸ Rendering ▸ Lighting*: el asset de iluminación de la escena. Modo
-   **Subtractive**, lightmapper GPU, resolución 3 texels/m, máximo 1024.
+   **Shadowmask**, lightmapper GPU, resolución 3 texels/m, máximo 1024.
 3. **Sondas de luz** (`Light Probe Group`) sobre la zona jugable: es como le
    llega la luz horneada a lo que se mueve.
-4. **Hornear**: *Generate Lighting* (o `Sailor Moon ▸ Sandbox ▸ Hornear luz`).
-   En el M5 tarda segundos.
+4. **Hornear**: `Sailor Moon ▸ Hornear luz` (**no** el botón de Unity: ver
+   TRAMPAS U15). En el M5 tarda segundos.
 
 ## 5. Oclusión
 

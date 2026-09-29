@@ -209,6 +209,10 @@ namespace SailorMoon.EditorTools
             level.FindPropertyRelative("globalTextureMipmapLimit").intValue = 0;
             level.FindPropertyRelative("skinWeights").intValue = 4;
             level.FindPropertyRelative("realtimeReflectionProbes").boolValue = false;
+            // Shadowmask (no Distance Shadowmask): lo estático NO entra en el mapa
+            // de sombras en tiempo real a ninguna distancia; su sombra está
+            // horneada. El pase de sombras solo dibuja lo que se mueve.
+            level.FindPropertyRelative("shadowmaskMode").intValue = (int)ShadowmaskMode.Shadowmask;
             so.FindProperty("m_CurrentQuality").intValue = 0;
 
             var perPlatform = so.FindProperty("m_PerPlatformDefaultQuality");

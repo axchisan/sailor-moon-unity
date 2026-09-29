@@ -102,7 +102,7 @@ Shader "SailorMoon/Toon"
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "ToonLighting.hlsl"
 
             struct Attributes
             {
@@ -154,13 +154,6 @@ Shader "SailorMoon/Toon"
                 return output;
             }
 
-            // El escalón del cel shading: 0 en sombra, 1 en luz, con un borde
-            // de _ShadeSoftness de ancho.
-            half Band(half x)
-            {
-                return smoothstep(_ShadeThreshold - _ShadeSoftness, _ShadeThreshold + _ShadeSoftness, x);
-            }
-
             half4 Frag(Varyings input) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(input);
@@ -170,35 +163,39 @@ Shader "SailorMoon/Toon"
                     clip(albedo.a - _Cutoff);
                 #endif
 
-                half3 normalWS = normalize(input.normalWS);
-                float4 shadowCoord = TransformWorldToShadowCoord(input.positionWS);
-
+                ToonSurface s;
+                s.albedo = albedo.rgb;
+                s.normalWS = normalize(input.normalWS);
+                s.positionWS = input.positionWS;
                 #if defined(LIGHTMAP_ON)
-                    half4 shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
-                    Light mainLight = GetMainLight(shadowCoord, input.positionWS, shadowMask);
-                    // Lo estático: la luz ya viene horneada con sus sombras. Solo
-                    // se resta la sombra en tiempo real de lo que se mueve
-                    // (la jugadora sobre el camino), que es el modo Subtractive.
-                    half3 baked = SampleLightmap(input.lightmapUV, normalWS);
-                    MixRealtimeAndBakedGI(mainLight, normalWS, baked);
-                    half3 color = albedo.rgb * baked;
+                    // Lo estático: el lightmap trae solo la luz rebotada (modo
+                    // Shadowmask) y la shadowmask, las sombras de lo estático.
+                    // La luz rebotada horneada, con la misma fuerza que el ambiente
+                    // de las sondas: entera, se sumaba al sol y dejaba el suelo al
+                    // ~190 % de su color (lavado, y la sombra casi no se leía).
+                    s.ambient = SampleLightmap(input.lightmapUV, s.normalWS) * _AmbientStrength;
+                    s.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
                 #else
-                    Light mainLight = GetMainLight(shadowCoord);
-                    half ndotl = dot(normalWS, mainLight.direction);
-                    // La sombra recibida entra en el mismo escalón: así la
-                    // sombra de un árbol sobre Serena tiene el mismo borde que
-                    // la de su propio cuerpo.
-                    half lit = Band(ndotl) * mainLight.shadowAttenuation;
-                    half3 tone = lerp(_ShadeColor.rgb, half3(1, 1, 1), lit);
-                    half3 color = albedo.rgb * (tone * mainLight.color
-                                               + input.ambient * _AmbientStrength);
-
-                    // Borde iluminado: se multiplica por la luz, así que en la
-                    // cara de sombra y de noche se apaga solo.
-                    half3 viewWS = normalize(GetWorldSpaceViewDir(input.positionWS));
-                    half rim = pow(saturate(1.0h - dot(normalWS, viewWS)), _RimPower);
-                    color += _RimColor.rgb * rim * lit * mainLight.color;
+                    // Lo que se mueve: ambiente de las sondas, y la oclusión de
+                    // las sondas oscurece a Serena bajo la sombra de un árbol.
+                    s.ambient = input.ambient * _AmbientStrength;
+                    s.shadowMask = SAMPLE_SHADOWMASK(0);
                 #endif
+
+                ToonStyle style;
+                style.shadeColor = _ShadeColor.rgb;
+                style.threshold = _ShadeThreshold;
+                style.softness = _ShadeSoftness;
+
+                half lit;
+                Light mainLight;
+                half3 color = ToonShade(s, style, lit, mainLight);
+
+                // Borde iluminado: se multiplica por la luz, así que en la cara
+                // de sombra y de noche se apaga solo (trampa 110 de Godot).
+                half3 viewWS = normalize(GetWorldSpaceViewDir(input.positionWS));
+                half rim = pow(saturate(1.0h - dot(s.normalWS, viewWS)), _RimPower);
+                color += _RimColor.rgb * rim * lit * mainLight.color;
 
                 color += albedo.rgb * input.fogAndVertexLight.yzw;
                 color = MixFog(color, input.fogAndVertexLight.x);

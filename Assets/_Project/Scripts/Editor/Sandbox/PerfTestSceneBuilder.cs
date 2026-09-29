@@ -67,14 +67,10 @@ namespace SailorMoon.EditorTools.Sandbox
             var scenes = EditorBuildSettings.scenes.Where(s => s.path != ScenePath).ToList();
             scenes.Insert(0, new EditorBuildSettingsScene(ScenePath, true));
             EditorBuildSettings.scenes = scenes.ToArray();
-            Debug.Log("[PerfTest] Escena montada. Falta hornear la luz: Sailor Moon ▸ Sandbox ▸ Hornear luz.");
+            Debug.Log("[PerfTest] Escena montada. Falta hornear la luz: Sailor Moon ▸ Hornear luz.");
         }
 
-        [MenuItem("Sailor Moon/Sandbox/Hornear luz")]
-        static void Bake()
-        {
-            Lightmapping.BakeAsync();
-        }
+
 
         // ------------------------------------------------------------------
         // Superficies: las recetas de paleta_terreno.gd, con el ajuste de
@@ -124,7 +120,9 @@ namespace SailorMoon.EditorTools.Sandbox
             var sun = sunGo.AddComponent<Light>();
             sun.type = LightType.Directional;
             sun.color = new Color(1f, 0.96f, 0.88f);
-            sun.intensity = 1.25f;
+            // 1,1: con el ambiente al 35 %, la cara iluminada queda cerca del
+            // color pintado (cel shading) en vez de quemada.
+            sun.intensity = 1.1f;
             sun.shadows = LightShadows.Soft;
             sun.shadowStrength = 0.75f;
             sun.lightmapBakeType = LightmapBakeType.Mixed;
@@ -162,10 +160,11 @@ namespace SailorMoon.EditorTools.Sandbox
                 bakedGI = true,
                 realtimeGI = false,
                 lightmapper = LightingSettings.Lightmapper.ProgressiveGPU,
-                // Subtractive: todo lo estático lleva la luz y sus sombras
-                // horneadas; en tiempo real solo se calcula la sombra de lo que
-                // se mueve. Es el modo más barato que existe en móvil.
-                mixedBakeMode = MixedLightingMode.Subtractive,
+                // Shadowmask: se hornean la luz rebotada y las sombras de lo
+                // estático; el sol lo calcula el shader toon en dos tonos. Lo
+                // estático conserva el cel shading y el pase de sombras solo
+                // dibuja lo que se mueve (ToonLighting.hlsl).
+                mixedBakeMode = MixedLightingMode.Shadowmask,
                 directionalityMode = LightmapsMode.NonDirectional,
                 lightmapResolution = 3f,
                 lightmapMaxSize = 1024,
@@ -238,21 +237,29 @@ namespace SailorMoon.EditorTools.Sandbox
             go.name = "Terreno";
             go.transform.position = new Vector3(-TerrainSize / 2f, 0, -TerrainSize / 2f);
             var t = go.GetComponent<UnityEngine.Terrain>();
-            t.drawInstanced = true;
+            // Shader toon propio (TerrainToon): no admite el dibujo instanciado.
+            t.drawInstanced = false;
             t.heightmapPixelError = 8;
-            t.basemapDistance = 90;
+            t.basemapDistance = 1000; // el shader toon es igual de cerca y de lejos
             // El terreno no proyecta sombra en tiempo real: su relieve ya va
             // horneado y el pase de sombra de una malla de este tamaño es caro.
             t.shadowCastingMode = ShadowCastingMode.Off;
-            t.materialTemplate = GraphicsSettings.currentRenderPipeline.defaultTerrainMaterial;
-            // SIN lightmap: en Unity 6000.6 el Terrain de URP con lightmap sale
-            // en blanco y negro según las capas (docs/TRAMPAS-UNITY.md, U5).
-            // Se ilumina en tiempo real y recibe el ambiente por sondas. Es
-            // además lo que la prueba tiene que medir: cuánto cuesta iluminar
-            // el suelo en la Adreno 619, que era el cuello de Godot.
+            t.materialTemplate = TerrainMaterial();
+            // Con lightmap: la luz rebotada y las sombras de los árboles, horneadas
+            // (con el shader propio no aparece el fallo U5 del Terrain de URP).
             GameObjectUtility.SetStaticEditorFlags(go,
-                StaticEditorFlags.OccluderStatic | StaticEditorFlags.OccludeeStatic);
+                StaticEditorFlags.ContributeGI | StaticEditorFlags.OccluderStatic | StaticEditorFlags.OccludeeStatic);
             return t;
+        }
+
+        static Material TerrainMaterial()
+        {
+            const string path = "Assets/_Project/Art/Terrain/TerrainToon.mat";
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (mat != null) return mat;
+            mat = new Material(Shader.Find("SailorMoon/TerrainToon"));
+            AssetDatabase.CreateAsset(mat, path);
+            return mat;
         }
 
         /// Llano en el centro con lomas suaves, y una cordillera que cierra el

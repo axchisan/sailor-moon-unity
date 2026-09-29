@@ -147,3 +147,23 @@ Mismo sitio y compilación de desarrollo. Teléfono frío (térmico 0, batería
 - **El terreno sigue siendo el 37 %** (5,9 ms): el shader toon con luz horneada
   sigue siendo lo primero de la Fase 1.
 - Serena pesa algo más (3,5 ms): con la cámara a 5 m ocupa más pantalla.
+
+### Prueba 3 — 2026-09-30, terreno toon con luz horneada (Shadowmask)
+
+Mismo sitio, teléfono frío (térmico 0, 38 °C), deriva −0,5 %.
+
+| Fila | GPU ms | Ganancia |
+|---|---|---|
+| referencia (media de 5) | **13,9** (antes 15,9) | — |
+| sin terreno | 9,9 | +41 % (el terreno cuesta **4,0 ms**, antes 5,9) |
+| sin decorado | 10,2 | +37 % |
+| sin sombras | 10,4 | +34 % |
+| sin personaje | 10,3 | +35 % |
+
+- **Por debajo del presupuesto de 14 ms** por primera vez en el sitio canónico.
+- Lo que cambió: modo **Shadowmask** (se hornean la luz rebotada y las sombras de
+  lo estático; el sol lo calcula el shader toon), terreno con **TerrainToon**
+  (5 lecturas de textura y luz en dos tonos) y lo estático fuera del pase de
+  sombras en tiempo real.
+- Además se ve mejor: los props recuperan el escalón del cel shading y los árboles
+  vuelven a dar sombra en el suelo.

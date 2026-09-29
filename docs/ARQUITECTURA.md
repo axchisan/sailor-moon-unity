@@ -106,7 +106,8 @@ no puede colarse en la build, y cambiar una herramienta no recompila el juego.
 - **`SailorMoon/Toon`** para personajes y props: dos tonos, sombra recibida en
   el mismo escalón, ambiente por vértice, lightmap para lo estático, rim que
   pasa por la luz y contorno por casco invertido (solo personajes).
-- **Iluminación Subtractive**: lo estático lleva la luz horneada; en tiempo real
-  solo la sombra de lo que se mueve.
-- **Terreno**: Unity Terrain con el shader de URP, **sin lightmap** de momento
-  (fallo de Unity 6000.6, ver [`TRAMPAS-UNITY.md`](TRAMPAS-UNITY.md) U5).
+- **Iluminación Shadowmask**: se hornean la luz rebotada y las sombras de lo
+  estático; el sol lo calcula el shader toon en dos tonos (`ToonLighting.hlsl`,
+  compartido). Lo estático no entra en el pase de sombras en tiempo real.
+- **Terreno**: Unity Terrain con `SailorMoon/TerrainToon` (4 capas máximo, sin
+  instanciar). Se hornea con `Sailor Moon ▸ Hornear luz` (TRAMPAS U15).

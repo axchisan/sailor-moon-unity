@@ -54,9 +54,9 @@ la compresión del lightmap (sin comprimir, igual), ni el terreno instanciado
 sano: se ven el terreno y las sombras de los árboles). La suavidad de las capas
 (alfa de la textura, ver U6) tampoco lo explicaba sola.
 
-**Decisión:** el terreno no se hornea (sin `ContributeGI`); se ilumina en tiempo
-real y recibe el ambiente por sondas. **Revisar al subir a 6.7 LTS.** Si sigue,
-la salida prevista es un shader toon de terreno propio que lea el lightmap.
+**Decisión (resuelta el 2026-09-30):** el terreno usa un shader propio,
+`SailorMoon/TerrainToon`, que lee bien el lightmap y la shadowmask. Ver U15 para
+cómo se hornea.
 
 ### U6. El Terrain de URP lee el alfa de la textura de capa como suavidad
 
@@ -165,3 +165,22 @@ campo de visión.
 En el editor, un componente que no existe devuelve un objeto que compara igual a
 `null` con `==`, pero **no** con el patrón `is { } x` de C#. Usar
 `TryGetComponent(out var x)`.
+
+### U15. El lightmapper descarta un terreno con shader propio
+
+**Síntoma:** al hornear, «'Terreno': Instance with no materials was removed from
+light baking input», y el terreno se queda sin lightmap (`lightmapIndex = -1`),
+aunque su material exista y tenga pase Meta. Declarar la dependencia
+`BaseMapGenShader` y el instanciado en el pase Meta no lo arregla.
+
+**Arreglo:** hornear con el material de terreno de URP y volver al nuestro al
+terminar. Lo hace `Sailor Moon ▸ Hornear luz` (`LightBaker.cs`). **No usar el
+botón «Generate Lighting» de Unity en escenas con terreno.**
+
+### U16. Luz rebotada entera + sol = suelo quemado
+
+Con el sol calculado en el shader y la luz rebotada del lightmap sumada entera,
+el suelo quedaba al ~190 % de su color y la sombra solo oscurecía un 17 %. El
+lightmap se multiplica por la misma fuerza de ambiente que las sondas (0,35) y el
+sol va a 1,1. **Para ver qué llega al shader del terreno:** su material tiene un
+campo «Depuración» (shadowmask, sombra final, lightmap).
