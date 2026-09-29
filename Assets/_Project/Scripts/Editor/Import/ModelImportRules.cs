@@ -22,7 +22,7 @@ namespace SailorMoon.EditorTools.Import
     /// </summary>
     class ModelImportRules : AssetPostprocessor
     {
-        const uint Version = 3;
+        const uint Version = 5;
         const string Characters = "Assets/_Project/Art/Characters/";
         const string Animations = "Assets/_Project/Art/Animations/Humanoid/";
         const string Props = "Assets/_Project/Art/Props/";
@@ -68,6 +68,11 @@ namespace SailorMoon.EditorTools.Import
             else if (assetPath.StartsWith(Animations))
             {
                 importer.animationType = ModelImporterAnimationType.Human;
+                // Cada clip crea su propio avatar desde su esqueleto, y
+                // HumanoidTPose le pone la referencia en pose T. (Probado y
+                // descartado: usar el avatar de Serena para todos. Los FBX «sin
+                // piel» de Mixamo traen otro esqueleto y Unity avisa de 19 cm de
+                // desfase en la cadera; ver TRAMPAS-UNITY U10.)
                 importer.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel;
                 importer.importAnimation = true;
                 importer.materialImportMode = ModelImporterMaterialImportMode.None;

@@ -93,3 +93,34 @@ Blender (props y personajes convertidos de .glb), nunca para Mixamo. **Al
 importar un modelo de origen nuevo, medir hacia dónde apunta el pie mientras
 anda** (el `bodyRotation` del Animator no sirve para esto: en estos avatares
 sale girado aunque el modelo esté bien).
+
+### U10. Avatares Humanoid fuera de pose T: articulaciones retorcidas
+
+**Síntoma:** en Play, rodillas juntas, pies girados y la falda pellizcada
+entre los muslos. Quieta y corriendo.
+
+**Causa:** Unity traduce cada animación de un cuerpo a otro pasando por un
+espacio común que da por hecho que **cada avatar está en pose T**. Ninguno lo
+estaba: el modelo de Serena (Mixamo «con piel», pasado por Blender) viene en
+pose A, y los clips «sin piel» traían reposos desviados entre 60° y 87° de la
+horizontal en los brazos. En Godot no se notaba porque las pistas se aplicaban
+hueso a hueso, sin traducir (ver `diseno/10-ANIMATION-TREE.md` §4 del
+proyecto viejo: «Mixamo exporta reposos distintos»).
+
+**Probado y descartado:** usar el avatar de Serena para todos los clips
+(`CopyFromOther`). Unity avisa «Bone length in configuration does not match
+position in animation file» con 19 cm de desfase en la cadera: los clips traen
+otro esqueleto.
+
+**Arreglo:** `HumanoidTPose.cs` hace lo que el botón «Enforce T-Pose» del
+configurador de avatares, en la importación y para todos: regenera la
+descripción del avatar desde el archivo y pone en T **solo las rotaciones** de
+brazos, antebrazos, manos, muslos y piernas.
+
+**Ojo, segunda trampa dentro de esta:** la primera versión copiaba también
+POSICIONES y el resto de nodos del esqueleto. El FBX de Serena trae el
+esqueleto desplazado respecto a la malla (cadera a 7 cm, pies a −0,77 m en
+reposo), y sobrescribir esas entradas le dejó una escala humana de **0,06**
+(las demás, 0,94): quedaba hundida en el suelo hasta la falda. Comprobación
+rápida tras tocar un avatar: `Animator.humanScale` tiene que salir cerca de la
+altura de la cadera (0,9 para estas alturas).
