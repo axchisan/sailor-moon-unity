@@ -12,9 +12,11 @@ resto del juego no sabe con qué se está jugando.
 | Mirar | Ratón. **Clic en el juego para capturarlo**, Esc para soltarlo. Sin capturar: arrastrar con el botón derecho |
 | Acercar / alejar la cámara | Rueda |
 | Saltar | Espacio |
-| Atacar | J o clic izquierdo *(todavía no hace nada)* |
+| Atacar | J o clic izquierdo |
+| Especial (cuando la barra brilla) | K |
 | Volver al inicio | R |
 | Panel de rendimiento | F1 |
+| Cambiar de escena (desarrollo) | F2 |
 
 ## Mando
 
@@ -23,13 +25,15 @@ resto del juego no sabe con qué se está jugando.
 | Mover / mirar | Stick izquierdo / derecho |
 | Saltar | A (Xbox) · ✕ (PlayStation) |
 | Atacar | X (Xbox) · □ (PlayStation) |
+| Especial | Y (Xbox) · △ (PlayStation) |
 | Volver al inicio | Select / View |
 
 ## Móvil
 
 Joystick flotante en la mitad izquierda (aparece donde se pone el dedo),
 arrastrar en la mitad derecha para mirar, botones de saltar y atacar abajo a la
-derecha. Tres dedos a la vez: panel de rendimiento. En PC los botones táctiles
+derecha, y el del especial (amarillo) encima. Tres dedos a la vez: panel de
+rendimiento. Cuatro dedos: cambiar de escena (desarrollo). En PC los botones táctiles
 no se muestran (`TouchControls._showOnDesktop` para verlos en el editor).
 
 ## Jugar en el Mac

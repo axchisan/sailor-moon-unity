@@ -60,6 +60,38 @@ namespace SailorMoon.Player
         Vector3 _spawnPosition;
         Quaternion _spawnRotation;
 
+        // Lo que manda el combate (PlayerCombat), no la jugadora.
+        Vector3 _drive;   // avance del golpe: vale un fotograma
+        Vector3 _knock;   // empujón recibido: se frena solo
+        [Tooltip("Cómo se frena un empujón recibido, en m/s².")]
+        [SerializeField] float _knockDrag = 18f;
+
+        /// Mientras está bloqueado (atacando, mareada), el joystick no mueve ni
+        /// gira, y no se puede saltar.
+        public bool Locked { get; set; }
+
+        /// Dirección que pide el joystick, en el mundo (relativa a la cámara).
+        /// Cero si no se toca. La usa el apuntado del combate.
+        public Vector3 WishDirection { get; private set; }
+
+        /// Mueve este fotograma a esta velocidad, además de lo demás.
+        public void Drive(Vector3 velocity) => _drive = velocity;
+
+        /// Empujón (golpe recibido). Lo horizontal se frena solo; lo vertical
+        /// lo coge la gravedad.
+        public void Knock(Vector3 velocity)
+        {
+            _knock = new Vector3(velocity.x, 0, velocity.z);
+            if (velocity.y > 0) _verticalSpeed = Mathf.Max(_verticalSpeed, velocity.y);
+        }
+
+        /// Girar de golpe (al atacar, la respuesta instantánea se siente mejor).
+        public void Face(Vector3 direction)
+        {
+            direction.y = 0;
+            if (direction.sqrMagnitude > 1e-4f) transform.rotation = Quaternion.LookRotation(direction);
+        }
+
         void Awake()
         {
             _controller = GetComponent<CharacterController>();
@@ -82,6 +114,7 @@ namespace SailorMoon.Player
             _controller.enabled = true;
             _planarVelocity = Vector3.zero;
             _verticalSpeed = 0f;
+            _knock = _drive = Vector3.zero;
         }
 
         void Update()
@@ -100,14 +133,17 @@ namespace SailorMoon.Player
             MovePlanar(dt);
             MoveVertical(dt);
 
-            Vector3 motion = (_planarVelocity + Vector3.up * _verticalSpeed) * dt;
+            Vector3 motion = (_planarVelocity + _drive + _knock + Vector3.up * _verticalSpeed) * dt;
             _controller.Move(motion);
+            _drive = Vector3.zero;
+            _knock = Vector3.MoveTowards(_knock, Vector3.zero, _knockDrag * dt);
         }
 
         void MovePlanar(float dt)
         {
             Vector2 stick = _input.Move;
             Vector3 wish = Vector3.zero;
+            WishDirection = Vector3.zero;
             if (stick.sqrMagnitude > 0.0001f)
             {
                 // Relativo a la cámara, aplanado: arriba en el joystick es
@@ -121,17 +157,20 @@ namespace SailorMoon.Player
                 float speed = push < _walkThreshold
                     ? Mathf.Lerp(0, _walkSpeed, push / _walkThreshold)
                     : Mathf.Lerp(_walkSpeed, _runSpeed, (push - _walkThreshold) / (1 - _walkThreshold));
-                wish = dir.normalized * speed;
-
-                Quaternion target = Quaternion.LookRotation(dir, Vector3.up);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, target, _turnSpeed * dt);
+                WishDirection = dir.normalized;
+                if (!Locked)
+                {
+                    wish = dir.normalized * speed;
+                    Quaternion target = Quaternion.LookRotation(dir, Vector3.up);
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, target, _turnSpeed * dt);
+                }
             }
             _planarVelocity = Vector3.MoveTowards(_planarVelocity, wish, _acceleration * dt);
         }
 
         void MoveVertical(float dt)
         {
-            if (_input.JumpPressed) _lastJumpPressTime = Time.time;
+            if (_input.JumpPressed && !Locked) _lastJumpPressTime = Time.time;
 
             bool canJump = Time.time - _lastGroundedTime <= _coyoteTime;
             bool wantsJump = Time.time - _lastJumpPressTime <= _jumpBuffer;

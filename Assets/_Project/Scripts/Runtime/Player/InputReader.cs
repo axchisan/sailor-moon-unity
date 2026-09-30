@@ -18,6 +18,7 @@ namespace SailorMoon.Player
     ///   Ratón            cámara (clic en el juego para capturarlo, Esc para soltarlo)
     ///   Rueda            acercar / alejar la cámara
     ///   Espacio          saltar           J / clic     atacar
+    ///   K                especial
     ///   R                volver al inicio F1           panel de rendimiento
     /// </summary>
     [DefaultExecutionOrder(-100)]
@@ -32,7 +33,7 @@ namespace SailorMoon.Player
         [Tooltip("Capturar el ratón al hacer clic en el juego (en PC).")]
         [SerializeField] bool _lockCursorOnClick = true;
 
-        InputAction _move, _walk, _mouseLook, _dragLook, _stickLook, _zoom, _jump, _attack, _respawn;
+        InputAction _move, _walk, _mouseLook, _dragLook, _stickLook, _zoom, _jump, _attack, _special, _respawn;
 
         /// Dirección de movimiento pedida, en la pantalla: x derecha, y adelante.
         public Vector2 Move { get; private set; }
@@ -42,15 +43,17 @@ namespace SailorMoon.Player
         public float Zoom { get; private set; }
         public bool JumpPressed { get; private set; }
         public bool AttackPressed { get; private set; }
+        public bool SpecialPressed { get; private set; }
         public bool RespawnPressed { get; private set; }
 
         // Lo que escriben los controles táctiles (TouchControls).
         Vector2 _touchMove, _touchLook;
-        bool _touchJump, _touchAttack;
+        bool _touchJump, _touchAttack, _touchSpecial;
         public void SetTouchMove(Vector2 v) => _touchMove = v;
         public void AddTouchLook(Vector2 pixels) => _touchLook += pixels;
         public void PressTouchJump() => _touchJump = true;
         public void PressTouchAttack() => _touchAttack = true;
+        public void PressTouchSpecial() => _touchSpecial = true;
 
         static bool CursorCaptured => Cursor.lockState == CursorLockMode.Locked;
 
@@ -89,12 +92,16 @@ namespace SailorMoon.Player
             _attack.AddBinding("<Mouse>/leftButton");
             _attack.AddBinding("<Gamepad>/buttonWest");
 
+            _special = new InputAction("Special", InputActionType.Button);
+            _special.AddBinding("<Keyboard>/k");
+            _special.AddBinding("<Gamepad>/buttonNorth");
+
             _respawn = new InputAction("Respawn", InputActionType.Button);
             _respawn.AddBinding("<Keyboard>/r");
             _respawn.AddBinding("<Gamepad>/select");
         }
 
-        InputAction[] All => new[] { _move, _walk, _mouseLook, _dragLook, _stickLook, _zoom, _jump, _attack, _respawn };
+        InputAction[] All => new[] { _move, _walk, _mouseLook, _dragLook, _stickLook, _zoom, _jump, _attack, _special, _respawn };
 
         void OnEnable() { foreach (var a in All) a.Enable(); }
         void OnDisable() { foreach (var a in All) a.Disable(); }
@@ -123,8 +130,9 @@ namespace SailorMoon.Player
 
             JumpPressed = _jump.WasPressedThisFrame() || _touchJump;
             AttackPressed = (_attack.WasPressedThisFrame() && !clickUsedToCapture) || _touchAttack;
+            SpecialPressed = _special.WasPressedThisFrame() || _touchSpecial;
             RespawnPressed = _respawn.WasPressedThisFrame();
-            _touchJump = _touchAttack = false;
+            _touchJump = _touchAttack = _touchSpecial = false;
         }
 
         /// El primer clic en el juego captura el ratón (y no cuenta como

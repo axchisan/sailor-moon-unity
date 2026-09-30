@@ -29,7 +29,7 @@
 | Fase | Qué | Sesiones | Estado |
 |---|---|---|---|
 | **0** | Cimientos, Serena moviéndose, medidor, medida en el HONOR | — | ✅ |
-| **1** | Serena completa | 4–5 | ⬜ |
+| **1** | Serena completa | 4–5 | 🟡 escala, terreno y combate hechos |
 | **2** | Combate completo: Pesadillas, Grietas, Temor | 4–5 | ⬜ |
 | **3** | Los sistemas del mundo | 6–7 | ⬜ |
 | **4** | **Rebanada vertical: Calle Juuban + Parque** → H1 | 8–10 | ⬜ |

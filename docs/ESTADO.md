@@ -55,14 +55,17 @@ rehace **en el editor**, reutilizando todos los assets y lo aprendido.
   - Panel F1 / tres dedos: fps, p99, CPU y GPU en ms, estado térmico.
   - Banco automático que se lanza por adb e intercala la referencia entre pruebas.
 
-### Lo siguiente
+### Fase 1 — en marcha (2026-09-30)
 
-Según [`juego/09-ROADMAP.md`](juego/09-ROADMAP.md):
-
-1. **Fase 1 — Serena completa**, empezando por el **terreno toon con luz
-   horneada** (el terreno es el 37 % del fotograma medido en el HONOR).
-2. **Guiones pendientes** (capítulos 2–6, interludios, misiones): se escriben
-   antes de la fase de cada barrio.
+- ✅ **Escala real** del mundo, la cámara y las velocidades ([`ESCALA.md`](ESCALA.md)).
+- ✅ **Terreno toon con luz horneada** (Shadowmask): GPU 15,9 → **13,9 ms** en el HONOR.
+- ✅ **Combate** ([`COMBATE.md`](COMBATE.md)): combo de 3 sincronizado con la
+  animación, auto-orientación e imán, especial con barra, corazones, herida y
+  mareo sin *game over*, sensación de impacto. Escena `CombatSandbox`.
+- ⬜ Transformación y zoom del especial.
+- ⬜ Tiara Lunar (primer poder de campo).
+- ⬜ Doble salto y agarrar cornisas.
+- ⬜ Afinar el combate jugando en el teléfono.
 
 ## 3. Documentos
 
@@ -77,6 +80,7 @@ Según [`juego/09-ROADMAP.md`](juego/09-ROADMAP.md):
 | [`RENDIMIENTO.md`](RENDIMIENTO.md) | ⭐ Presupuestos, cómo se mide en el teléfono, decisiones de render y resultados |
 | [`PIPELINE-ASSETS.md`](PIPELINE-ASSETS.md) | Cómo entra cada tipo de asset y qué hace Unity con él |
 | [`ESCENARIOS.md`](ESCENARIOS.md) | Receta para construir un nivel en el editor |
+| [`COMBATE.md`](COMBATE.md) | ⭐ **El combate**: cómo está hecho y «quiero cambiar X → toca aquí» |
 | [`ESCALA.md`](ESCALA.md) | ⭐ **El estándar de tamaños**: cuánto mide cada cosa, la cámara, las velocidades y cómo entra un modelo nuevo |
 | [`TRAMPAS-UNITY.md`](TRAMPAS-UNITY.md) | ⭐ Fallos ya pisados en este proyecto |
 | [`aprendido/LECCIONES-GODOT.md`](aprendido/LECCIONES-GODOT.md) | ⭐ Las 133 trampas de Godot, destiladas a lo que sigue valiendo |

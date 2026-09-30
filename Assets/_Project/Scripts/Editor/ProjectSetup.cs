@@ -33,6 +33,7 @@ namespace SailorMoon.EditorTools
         public static void ApplyAll()
         {
             ApplyPlayerSettings();
+            ApplyLayers();
             ApplyAndroidSettings();
             var pipeline = EnsurePipelineAsset();
             ApplyQualitySettings(pipeline);
@@ -82,6 +83,24 @@ namespace SailorMoon.EditorTools
             PlayerSettings.allowedAutorotateToLandscapeRight = true;
             PlayerSettings.allowedAutorotateToPortrait = false;
             PlayerSettings.allowedAutorotateToPortraitUpsideDown = false;
+        }
+
+        /// <summary>
+        /// Capas de física con nombre (las usa SailorMoon.Combat.Layers). El
+        /// combate pregunta a la física por capas: los golpes de la jugadora
+        /// solo buscan en «Enemy» y el escenario (Default) tapa los golpes.
+        /// </summary>
+        static void ApplyLayers()
+        {
+            var assets = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset");
+            if (assets.Length == 0) return;
+            var so = new SerializedObject(assets[0]);
+            var layers = so.FindProperty("layers");
+            void Name(int i, string n) => layers.GetArrayElementAtIndex(i).stringValue = n;
+            Name(SailorMoon.Combat.Layers.Player, "Player");
+            Name(SailorMoon.Combat.Layers.Enemy, "Enemy");
+            Name(SailorMoon.Combat.Layers.Pickup, "Pickup");
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         static void ApplyAndroidSettings()

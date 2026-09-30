@@ -13,7 +13,9 @@ GameObject:
   - component: {fileID: 2850954572404963813}
   - component: {fileID: 7199470638177895899}
   - component: {fileID: 378373982222640765}
-  m_Layer: 0
+  - component: {fileID: 4707340851947916560}
+  - component: {fileID: 3028785386477372537}
+  m_Layer: 6
   m_Name: Serena
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,6 +104,7 @@ MonoBehaviour:
   _jumpBuffer: 0.2
   _cameraTransform: {fileID: 0}
   _killHeight: -30
+  _knockDrag: 18
 --- !u!114 &378373982222640765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -116,6 +119,44 @@ MonoBehaviour:
   m_EditorClassIdentifier: SailorMoon.Runtime::SailorMoon.Player.PlayerAnimator
   _animator: {fileID: 0}
   _speedDamp: 0.08
+--- !u!114 &4707340851947916560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3045439821912817185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee140580144fc418abc19e0129ebb833, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SailorMoon.Runtime::SailorMoon.Combat.Health
+  _max: 5
+  _invulnerableAfterHit: 1.5
+--- !u!114 &3028785386477372537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3045439821912817185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93669cf3cbf854b5a97d8aa151a22887, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SailorMoon.Runtime::SailorMoon.Player.PlayerCombat
+  _combo:
+  - {fileID: 11400000, guid: bd7b6afe59a074d2b9e888184eeb99c3, type: 2}
+  - {fileID: 11400000, guid: 1ab105ba04f784cf2b0b6397bc35663b, type: 2}
+  - {fileID: 11400000, guid: 5b64c2d1d87ed4f6fb8456928ae45977, type: 2}
+  _special: {fileID: 11400000, guid: 83bbc19fd788e4cd096e15341eee9edd, type: 2}
+  _comboWindow: 0.8
+  _targetRange: 4.5
+  _specialCost: 12
+  _specialRadius: 5
+  _hurtTime: 0.35
+  _dizzyTime: 1.6
+  _animator: {fileID: 0}
 --- !u!1 &8945642923610345621
 GameObject:
   m_ObjectHideFlags: 0

@@ -38,6 +38,9 @@ Shader "SailorMoon/Toon"
         _OutlineWidth ("Grosor del contorno (m)", Range(0, 0.02)) = 0.004
         _OutlineColor ("Color del contorno", Color) = (0.12, 0.08, 0.14, 1)
 
+        [Header(Combate)]
+        _FlashAmount ("Destello", Range(0, 1)) = 0
+
         [Header(Opciones)]
         [Toggle(_ALPHATEST_ON)] _AlphaClip ("Recortar por alfa", Float) = 0
         _Cutoff ("Umbral de recorte", Range(0, 1)) = 0.5
@@ -70,6 +73,7 @@ Shader "SailorMoon/Toon"
             float _OutlineWidth;
             half4 _OutlineColor;
             half _Cutoff;
+            half _FlashAmount;
         CBUFFER_END
 
         // Declara _BaseMap y lo que esperan las pasadas de sombra y
@@ -199,6 +203,8 @@ Shader "SailorMoon/Toon"
 
                 color += albedo.rgb * input.fogAndVertexLight.yzw;
                 color = MixFog(color, input.fogAndVertexLight.x);
+                // Destello al recibir un golpe (80 ms, GDD §5.7).
+                color = lerp(color, half3(1, 1, 1), _FlashAmount);
                 return half4(color, 1);
             }
             ENDHLSL

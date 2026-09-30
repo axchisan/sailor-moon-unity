@@ -2,6 +2,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
@@ -9,6 +10,7 @@ namespace SailorMoon.Diagnostics
 {
     /// <summary>
     /// Panel de rendimiento: F1, o tres dedos a la vez en el móvil.
+    /// Cambiar de escena (herramienta de desarrollo): F2, o cuatro dedos.
     ///
     /// Se refresca cuatro veces por segundo y no en cada fotograma: montar el
     /// texto también cuesta, y un medidor que pesa falsea lo que mide.
@@ -20,7 +22,7 @@ namespace SailorMoon.Diagnostics
 
         FrameStats _stats;
         float _nextRefresh;
-        bool _threeFingersDown;
+        bool _threeFingersDown, _fourFingersDown;
         readonly StringBuilder _sb = new(512);
 
         void OnEnable()
@@ -58,6 +60,16 @@ namespace SailorMoon.Diagnostics
 
         void HandleToggle()
         {
+            bool next = Keyboard.current != null && Keyboard.current.f2Key.wasPressedThisFrame;
+            bool four = Touch.activeTouches.Count >= 4;
+            if (four && !_fourFingersDown) next = true;
+            _fourFingersDown = four;
+            if (next && SceneManager.sceneCountInBuildSettings > 1)
+            {
+                SceneManager.LoadScene((SceneManager.GetActiveScene().buildIndex + 1) % SceneManager.sceneCountInBuildSettings);
+                return;
+            }
+
             bool toggle = Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame;
             bool three = Touch.activeTouches.Count >= 3;
             if (three && !_threeFingersDown) toggle = true;

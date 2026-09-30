@@ -22,6 +22,7 @@ namespace SailorMoon.UI
         [SerializeField] RectTransform _stickKnob;
         [SerializeField] RectTransform _jumpButton;
         [SerializeField] RectTransform _attackButton;
+        [SerializeField] RectTransform _specialButton;
         [Tooltip("Radio del joystick en píxeles de referencia (1280×720).")]
         [SerializeField] float _stickRadius = 110f;
         [Tooltip("Mostrar los botones aunque no haya pantalla táctil (para probarlos en el editor).")]
@@ -41,6 +42,7 @@ namespace SailorMoon.UI
             bool touch = Application.isMobilePlatform || _showOnDesktop;
             if (_jumpButton) _jumpButton.gameObject.SetActive(touch);
             if (_attackButton) _attackButton.gameObject.SetActive(touch);
+            if (_specialButton) _specialButton.gameObject.SetActive(touch);
         }
 
         void OnDisable()
@@ -63,6 +65,7 @@ namespace SailorMoon.UI
                 {
                     if (Hit(_jumpButton, pos)) { _input.PressTouchJump(); continue; }
                     if (Hit(_attackButton, pos)) { _input.PressTouchAttack(); continue; }
+                    if (Hit(_specialButton, pos)) { _input.PressTouchSpecial(); continue; }
                     if (pos.x < Screen.width * 0.5f && _stickFinger < 0)
                     {
                         _stickFinger = id;

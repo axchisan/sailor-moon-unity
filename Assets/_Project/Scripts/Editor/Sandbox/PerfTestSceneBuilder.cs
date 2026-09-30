@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SailorMoon.CameraRig;
+using SailorMoon.Combat;
 using SailorMoon.Diagnostics;
 using SailorMoon.EditorTools.Characters;
 using SailorMoon.EditorTools.Terrain;
@@ -27,7 +28,7 @@ namespace SailorMoon.EditorTools.Sandbox
     /// nada al arrancar — ese fue el error de fondo en Godot, que montaba el
     /// parque entero en cada partida (docs/aprendido/LECCIONES.md §1).
     /// </summary>
-    static class PerfTestSceneBuilder
+    static partial class PerfTestSceneBuilder
     {
         const string ScenePath = "Assets/_Project/Scenes/Sandbox/PerfTest.unity";
         const string SceneFolder = "Assets/_Project/Scenes/Sandbox/PerfTest";
@@ -62,6 +63,7 @@ namespace SailorMoon.EditorTools.Sandbox
             var (brain, vcam) = BuildCamera(serena);
             var canvas = BuildUI(serena);
             BuildBenchmark(terrain, decor, sun, serena, brain, vcam, canvas);
+            BuildCombatFeel();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             var scenes = EditorBuildSettings.scenes.Where(s => s.path != ScenePath).ToList();
@@ -488,7 +490,7 @@ namespace SailorMoon.EditorTools.Sandbox
             return serena;
         }
 
-        static (CinemachineBrain, CinemachineCamera) BuildCamera(GameObject serena)
+        internal static (CinemachineBrain, CinemachineCamera) BuildCamera(GameObject serena)
         {
             var camGo = new GameObject("Main Camera") { tag = "MainCamera" };
             var cam = camGo.AddComponent<Camera>();
@@ -514,6 +516,8 @@ namespace SailorMoon.EditorTools.Sandbox
             orbit.VerticalAxis.Center = 14f;
             vGo.AddComponent<CinemachineRotationComposer>();
             vGo.AddComponent<AdaptiveLens>();
+            // Recibe las sacudidas que genera CombatFeel.
+            vGo.AddComponent<CinemachineImpulseListener>();
             var deocc = vGo.AddComponent<CinemachineDeoccluder>();
             deocc.CollideAgainst = LayerMask.GetMask("Default");
             var look = vGo.AddComponent<CameraLook>();
@@ -527,7 +531,7 @@ namespace SailorMoon.EditorTools.Sandbox
             return (brain, vcam);
         }
 
-        static Canvas BuildUI(GameObject serena)
+        internal static Canvas BuildUI(GameObject serena)
         {
             var canvasGo = new GameObject("Interfaz");
             var canvas = canvasGo.AddComponent<Canvas>();
@@ -546,6 +550,8 @@ namespace SailorMoon.EditorTools.Sandbox
             var jump = Img("Saltar", touchGo.transform, circle, new Color(1f, 0.8f, 0.9f, 0.55f), 150);
             Anchor(jump, new Vector2(1, 0), new Vector2(-130, 130));
             var attack = Img("Atacar", touchGo.transform, circle, new Color(1f, 0.55f, 0.75f, 0.55f), 190);
+            var special = Img("Especial", touchGo.transform, circle, new Color(1f, 0.9f, 0.4f, 0.7f), 130);
+            Anchor(special, new Vector2(1, 0), new Vector2(-230, 290));
             Anchor(attack, new Vector2(1, 0), new Vector2(-300, 110));
 
             var touch = touchGo.AddComponent<TouchControls>();
@@ -555,6 +561,7 @@ namespace SailorMoon.EditorTools.Sandbox
             so.FindProperty("_stickKnob").objectReferenceValue = knob;
             so.FindProperty("_jumpButton").objectReferenceValue = jump;
             so.FindProperty("_attackButton").objectReferenceValue = attack;
+            so.FindProperty("_specialButton").objectReferenceValue = special;
             so.ApplyModifiedPropertiesWithoutUndo();
 
             var textGo = new GameObject("Rendimiento", typeof(RectTransform));
@@ -573,6 +580,7 @@ namespace SailorMoon.EditorTools.Sandbox
             var oso = new SerializedObject(overlay);
             oso.FindProperty("_label").objectReferenceValue = text;
             oso.ApplyModifiedPropertiesWithoutUndo();
+            BuildHud(canvasGo.transform, serena, special, circle);
             return canvas;
         }
 
@@ -608,6 +616,114 @@ namespace SailorMoon.EditorTools.Sandbox
         }
 
         // ------------------------------------------------------------------
+
+        /// Corazones arriba a la izquierda (bajo el panel de rendimiento no: a la
+        /// derecha de él) y la barra del especial debajo.
+        static void BuildHud(Transform canvas, GameObject serena, RectTransform specialButton, Sprite circle)
+        {
+            var hudGo = new GameObject("HUD", typeof(RectTransform));
+            hudGo.transform.SetParent(canvas, false);
+            Stretch(hudGo.GetComponent<RectTransform>());
+            var hearts = new Image[8];
+            for (int i = 0; i < hearts.Length; i++)
+            {
+                var h = Img($"Corazon{i}", hudGo.transform, circle, Color.white, 44);
+                h.anchorMin = h.anchorMax = h.pivot = new Vector2(0.5f, 1);
+                h.anchoredPosition = new Vector2(-170 + i * 50, -24);
+                hearts[i] = h.GetComponent<Image>();
+            }
+            var barBack = Img("Especial fondo", hudGo.transform, null, new Color(0, 0, 0, 0.35f), 0);
+            barBack.anchorMin = barBack.anchorMax = barBack.pivot = new Vector2(0.5f, 1);
+            barBack.sizeDelta = new Vector2(360, 18);
+            barBack.anchoredPosition = new Vector2(0, -80);
+            var fill = Img("Especial", barBack, null, Color.white, 0);
+            Stretch(fill);
+            var img = fill.GetComponent<Image>();
+            // Una imagen «rellena» necesita sprite para recortarse.
+            img.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+            img.type = Image.Type.Filled;
+            img.fillMethod = Image.FillMethod.Horizontal;
+            img.fillAmount = 0;
+
+            var hud = hudGo.AddComponent<CombatHud>();
+            var so = new SerializedObject(hud);
+            so.FindProperty("_player").objectReferenceValue = serena.GetComponent<PlayerCombat>();
+            var arr = so.FindProperty("_hearts");
+            arr.arraySize = hearts.Length;
+            for (int i = 0; i < hearts.Length; i++) arr.GetArrayElementAtIndex(i).objectReferenceValue = hearts[i];
+            so.FindProperty("_specialFill").objectReferenceValue = img;
+            so.FindProperty("_specialButton").objectReferenceValue = specialButton;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        /// El «jugo» del combate: chispas, sonidos y sacudidas (uno por escena).
+        internal static void BuildCombatFeel()
+        {
+            var go = new GameObject("Sensación de combate");
+            go.AddComponent<CinemachineImpulseSource>();
+            var feel = go.AddComponent<CombatFeel>();
+            var so = new SerializedObject(feel);
+            so.FindProperty("_sparksPrefab").objectReferenceValue = SparksPrefab();
+            string sfx = "Assets/_Project/Audio/SFX/";
+            so.FindProperty("_hit").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(sfx + "hit.wav");
+            so.FindProperty("_hitHeavy").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(sfx + "hit_heavy.wav");
+            so.FindProperty("_hurt").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(sfx + "hurt.wav");
+            so.FindProperty("_defeat").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(sfx + "purify.wav");
+            so.FindProperty("_special").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(sfx + "special.wav");
+            so.FindProperty("_block").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AudioClip>(sfx + "block.wav");
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        /// Chispas de estrellas y corazones rosas (GDD §5.7). Prefab editable.
+        static ParticleSystem SparksPrefab()
+        {
+            const string path = "Assets/_Project/Prefabs/Gameplay/HitSparks.prefab";
+            var existing = AssetDatabase.LoadAssetAtPath<ParticleSystem>(path);
+            if (existing != null) return existing;
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            const string matPath = "Assets/_Project/Art/Materials/Fx/Sparks.mat";
+            Directory.CreateDirectory(Path.GetDirectoryName(matPath));
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+            if (mat == null)
+            {
+                mat = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+                mat.SetTexture("_BaseMap", AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/_Project/Art/UI/circle.png"));
+                // Aditivo: brilla sobre cualquier fondo.
+                mat.SetFloat("_Surface", 1);
+                mat.SetFloat("_Blend", 2);
+                AssetDatabase.CreateAsset(mat, matPath);
+            }
+
+            var go = new GameObject("HitSparks");
+            var ps = go.AddComponent<ParticleSystem>();
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            var main = ps.main;
+            main.playOnAwake = false;
+            main.duration = 0.4f;
+            main.loop = false;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(0.25f, 0.45f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(3f, 6.5f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.08f, 0.22f);
+            main.startColor = new ParticleSystem.MinMaxGradient(new Color(1f, 0.55f, 0.8f), new Color(1f, 0.95f, 0.5f));
+            main.gravityModifier = 0.6f;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.maxParticles = 40;
+            var emission = ps.emission;
+            emission.rateOverTime = 0;
+            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 14) });
+            var shape = ps.shape;
+            shape.shapeType = ParticleSystemShapeType.Sphere;
+            shape.radius = 0.15f;
+            var sizeOverLife = ps.sizeOverLifetime;
+            sizeOverLife.enabled = true;
+            sizeOverLife.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.Linear(0, 1, 1, 0));
+            go.GetComponent<ParticleSystemRenderer>().sharedMaterial = mat;
+
+            var prefab = PrefabUtility.SaveAsPrefabAsset(go, path);
+            Object.DestroyImmediate(go);
+            return prefab.GetComponent<ParticleSystem>();
+        }
 
         static Sprite CircleSprite()
         {

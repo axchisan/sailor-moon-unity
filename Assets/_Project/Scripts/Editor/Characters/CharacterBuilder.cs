@@ -1,4 +1,5 @@
 using System.Linq;
+using SailorMoon.Combat;
 using SailorMoon.Player;
 using UnityEditor;
 using UnityEditor.Animations;
@@ -39,10 +40,12 @@ namespace SailorMoon.EditorTools.Characters
             ctrl.AddParameter("VerticalSpeed", AnimatorControllerParameterType.Float);
             ctrl.AddParameter("Jump", AnimatorControllerParameterType.Trigger);
             ctrl.AddParameter("LocomotionRate", AnimatorControllerParameterType.Float);
+            ctrl.AddParameter("ActionSpeed", AnimatorControllerParameterType.Float);
             // `parameters` devuelve una copia: hay que reasignar el array.
             var ps = ctrl.parameters;
             ps.First(p => p.name == "Grounded").defaultBool = true;
             ps.First(p => p.name == "LocomotionRate").defaultFloat = 1f;
+            ps.First(p => p.name == "ActionSpeed").defaultFloat = 1f;
             ctrl.parameters = ps;
 
             var sm = ctrl.layers[0].stateMachine;
@@ -102,6 +105,20 @@ namespace SailorMoon.EditorTools.Characters
             landIdle.hasExitTime = true;
             landIdle.exitTime = 0.75f;
             landIdle.duration = 0.2f;
+
+            // Acciones: sin transiciones. Las lanza el código (PlayerCombat) con
+            // CrossFade y vuelve él a Locomotion; su velocidad la marca cada
+            // ataque (AttackData.animSpeed) por el parámetro ActionSpeed.
+            float y = 260;
+            foreach (var (state, clip) in new[] {
+                         ("Attack1", "attack_1"), ("Attack2", "attack_2"), ("Attack3", "attack_3"),
+                         ("Special", "special"), ("Hurt", "hurt"), ("Dizzy", "dizzy") })
+            {
+                var st = State(sm, state, clip, new Vector3(0, y));
+                st.speedParameter = "ActionSpeed";
+                st.speedParameterActive = true;
+                y += 60;
+            }
 
             EditorUtility.SetDirty(ctrl);
             AssetDatabase.SaveAssets();
@@ -163,6 +180,18 @@ namespace SailorMoon.EditorTools.Characters
             root.AddComponent<InputReader>();
             root.AddComponent<PlayerMotor>();
             root.AddComponent<PlayerAnimator>();
+            root.AddComponent<Health>();
+            var combat = root.AddComponent<PlayerCombat>();
+            var cso = new SerializedObject(combat);
+            var combo = cso.FindProperty("_combo");
+            combo.arraySize = 3;
+            for (int i = 0; i < 3; i++)
+                combo.GetArrayElementAtIndex(i).objectReferenceValue =
+                    AssetDatabase.LoadAssetAtPath<AttackData>($"Assets/_Project/Settings/Combat/Serena_Combo{i + 1}.asset");
+            cso.FindProperty("_special").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<AttackData>("Assets/_Project/Settings/Combat/Serena_Special.asset");
+            cso.ApplyModifiedPropertiesWithoutUndo();
+            root.layer = Layers.Player;
 
             var target = new GameObject("CameraTarget").transform;
             target.SetParent(root.transform, false);
